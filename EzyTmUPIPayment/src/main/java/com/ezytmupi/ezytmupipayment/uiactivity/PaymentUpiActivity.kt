@@ -32,7 +32,7 @@ class PaymentUpiActivity : AppCompatActivity() {
 				appendQueryParameter("pa", vpa)
 				appendQueryParameter("pn", name)
 				appendQueryParameter("tid", txnId)
-				appendQueryParameter("mc", payeeMerchantCode)
+				payeeMerchantCode?.let { appendQueryParameter("mc", it) }
 				appendQueryParameter("tr", txnRefId)
 				appendQueryParameter("tn", description)
 				appendQueryParameter("am", amount)

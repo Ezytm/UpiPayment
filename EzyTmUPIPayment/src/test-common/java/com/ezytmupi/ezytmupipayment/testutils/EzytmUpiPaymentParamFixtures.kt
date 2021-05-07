@@ -32,7 +32,7 @@ fun validEasyUpiPaymentBuilderFixture(builder: EzytmUpiPayment.Builder) {
 		.setAmount(validAmount)
 }
 
-fun paymentStatusListener() = object : PaymentUpiStatusListener {
+fun paymentUpiStatusListener() = object : PaymentUpiStatusListener {
 	override fun onTransactionCompleted(transactionDetails: TransactionDetails) {}
 	override fun onTransactionCancelled() {}
 }
