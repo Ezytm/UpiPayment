@@ -1,0 +1,3 @@
+include ':EzyTmUPIPayment'
+include ':app'
+rootProject.name = "EzytmUpi"
