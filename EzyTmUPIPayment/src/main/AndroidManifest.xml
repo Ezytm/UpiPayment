@@ -12,7 +12,7 @@
 
     <application>
         <activity
-            android:name=".uiactivity.PaymentUpiActivity"
+            android:name=".PaymentUiActivity"
             android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
     </application>
 

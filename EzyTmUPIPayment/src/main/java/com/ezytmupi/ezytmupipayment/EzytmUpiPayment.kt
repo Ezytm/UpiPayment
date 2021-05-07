@@ -10,11 +10,12 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.OnLifecycleEvent
 import com.ezytmupi.ezytmupipayment.EzytmUpiPayment.Builder
-import com.ezytmupi.ezytmupipayment.exceptions.AppNotFoundException
-import com.ezytmupi.ezytmupipayment.listeners.PaymentUpiStatusListener
-import com.ezytmupi.ezytmupipayment.models.PaymentUpi
-import com.ezytmupi.ezytmupipayment.models.PaymentApp
-import com.ezytmupi.ezytmupipayment.uiactivity.PaymentUpiActivity
+import com.ezytmupi.ezytmupipayment.exception.AppNotFoundException
+import com.ezytmupi.ezytmupipayment.listener.PaymentStatusListener
+import com.ezytmupi.ezytmupipayment.model.Payment
+import com.ezytmupi.ezytmupipayment.model.PaymentApp
+import com.ezytmupi.ezytmupipayment.PaymentUiActivity
+
 
 /**
  * Class to implement Easy UPI Payment
@@ -23,7 +24,7 @@ import com.ezytmupi.ezytmupipayment.uiactivity.PaymentUpiActivity
 @Suppress("unused")
 class EzytmUpiPayment constructor(
 		private val mActivity: Activity,
-		private val mPayment: PaymentUpi
+		private val mPayment: Payment
 ) {
 
 	@VisibleForTesting
@@ -55,8 +56,8 @@ class EzytmUpiPayment constructor(
 	 */
 	fun startPayment() {
 		// Create Payment Activity Intent
-		val payIntent = Intent(mActivity, PaymentUpiActivity::class.java).apply {
-			putExtra(PaymentUpiActivity.EXTRA_KEY_PAYMENT, mPayment)
+		val payIntent = Intent(mActivity, PaymentUiActivity::class.java).apply {
+			putExtra(PaymentUiActivity.EXTRA_KEY_PAYMENT, mPayment)
 		}
 
 		// Start Payment Activity
@@ -68,12 +69,12 @@ class EzytmUpiPayment constructor(
 	 *
 	 * @param mListener Implementation of PaymentStatusListener
 	 */
-	fun setPaymentStatusListener(mListener: PaymentUpiStatusListener) {
+	fun setPaymentStatusListener(mListener: PaymentStatusListener) {
 		Singleton.listener = mListener
 	}
 
 	/**
-	 * Removes the [PaymentUpiStatusListener] which is already registered.
+	 * Removes the [PaymentStatusListener] which is already registered.
 	 */
 	fun removePaymentStatusListener() {
 		Singleton.listener = null
@@ -205,11 +206,11 @@ class EzytmUpiPayment constructor(
 		fun build(): EzytmUpiPayment {
 			validate()
 
-			val payment = PaymentUpi(
+			val payment = Payment(
 					currency = "INR",
 					vpa = payeeVpa!!,
 					name = payeeName!!,
-					payeeMerchantCode = payeeMerchantCode!!,
+					payeeMerchantCode = payeeMerchantCode,
 					txnId = transactionId!!,
 					txnRefId = transactionRefId!!,
 					description = description!!,
@@ -233,8 +234,8 @@ class EzytmUpiPayment constructor(
 				}
 			}
 
-			payeeMerchantCode?.run {
-				checkNotNull(this) { "Payee Merchant Code Should be Valid!" }
+			payeeMerchantCode?.let {
+				check(it.isNotBlank()) { "Merchant Code Should be Valid!" }
 			}
 
 			transactionId.run {

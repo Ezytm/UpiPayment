@@ -1,4 +1,4 @@
-package com.ezytmupi.ezytmupipayment.uiactivity
+package com.ezytmupi.ezytmupipayment
 
 import android.content.Intent
 import android.net.Uri
@@ -8,22 +8,22 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.ezytmupi.ezytmupipayment.R
 import com.ezytmupi.ezytmupipayment.Singleton
-import com.ezytmupi.ezytmupipayment.exceptions.AppNotFoundException
-import com.ezytmupi.ezytmupipayment.models.PaymentUpi
-import com.ezytmupi.ezytmupipayment.models.TransactionDetails
-import com.ezytmupi.ezytmupipayment.models.TransactionStatus
+import com.ezytmupi.ezytmupipayment.exception.AppNotFoundException
+import com.ezytmupi.ezytmupipayment.model.Payment
+import com.ezytmupi.ezytmupipayment.model.TransactionDetails
+import com.ezytmupi.ezytmupipayment.model.TransactionStatus
 import java.util.*
 
-class PaymentUpiActivity : AppCompatActivity() {
+class PaymentUiActivity : AppCompatActivity() {
 
-	private lateinit var payment: PaymentUpi
+	private lateinit var payment: Payment
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		setContentView(R.layout.activity_upipay)
 
-		payment = (intent.getSerializableExtra(EXTRA_KEY_PAYMENT) as PaymentUpi?)
-			?: throw IllegalStateException("Unable to parse payment details")
+		payment = (intent.getSerializableExtra(EXTRA_KEY_PAYMENT) as Payment?)
+				?: throw IllegalStateException("Unable to parse payment details")
 
 		// Set Parameters for UPI
 		val paymentUri = Uri.Builder().apply {
@@ -45,7 +45,9 @@ class PaymentUpiActivity : AppCompatActivity() {
 			data = paymentUri
 
 			// Check for Default package
-			payment.defaultPackage?.let { `package` = it }
+			payment.defaultPackage?.let {
+				`package` = it
+			}
 		}
 
 		// Show Dialog to user
@@ -56,9 +58,9 @@ class PaymentUpiActivity : AppCompatActivity() {
 			startActivityForResult(appChooser, PAYMENT_REQUEST)
 		} else {
 			Toast.makeText(
-				this,
-				"No UPI app found! Please Install to Proceed!",
-				Toast.LENGTH_SHORT).show()
+					this,
+					"No UPI app found! Please Install to Proceed!",
+					Toast.LENGTH_SHORT).show()
 			throwOnAppNotFound()
 		}
 	}
@@ -97,15 +99,15 @@ class PaymentUpiActivity : AppCompatActivity() {
 	internal fun getTransactionDetails(response: String): TransactionDetails {
 		return with(getMapFromQuery(response)) {
 			TransactionDetails(
-				transactionId = get("txnId"),
-				responseCode = get("responseCode"),
-				approvalRefNo = get("ApprovalRefNo"),
-				transactionRefId = get("txnRef"),
-				amount = payment.amount,
-				transactionStatus = TransactionStatus.valueOf(
-					get("Status")?.toUpperCase(Locale.getDefault())
-						?: TransactionStatus.FAILURE.name
-				)
+					transactionId = get("txnId"),
+					responseCode = get("responseCode"),
+					approvalRefNo = get("ApprovalRefNo"),
+					transactionRefId = get("txnRef"),
+					amount = payment.amount,
+					transactionStatus = TransactionStatus.valueOf(
+							get("Status")?.toUpperCase(Locale.getDefault())
+									?: TransactionStatus.FAILURE.name
+					)
 			)
 		}
 	}
@@ -114,10 +116,10 @@ class PaymentUpiActivity : AppCompatActivity() {
 	internal fun getMapFromQuery(queryString: String): Map<String, String> {
 		val map = mutableMapOf<String, String>()
 		val keyValuePairs = queryString
-			.split("&")
-			.map { param ->
-				param.split("=").let { Pair(it[0], it[1]) }
-			}
+				.split("&")
+				.map { param ->
+					param.split("=").let { Pair(it[0], it[1]) }
+				}
 		map.putAll(keyValuePairs)
 		return map
 	}

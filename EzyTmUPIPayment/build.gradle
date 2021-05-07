@@ -11,9 +11,7 @@ android {
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
-
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
         multiDexEnabled true
     }
 
@@ -78,6 +76,4 @@ dokkaHtml.configure {
         }
     }
 }
-repositories {
-    mavenCentral()
-}
+apply plugin: 'com.vanniktech.maven.publish'
