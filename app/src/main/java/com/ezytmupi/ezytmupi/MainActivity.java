@@ -16,9 +16,11 @@ import android.widget.Toast;
 
 
 import com.ezytmupi.ezytmupipayment.EzytmUpiPayment;
-import com.ezytmupi.ezytmupipayment.listeners.PaymentUpiStatusListener;
+import com.ezytmupi.ezytmupipayment.listeners.PaymentStatusListener;
+
+import com.ezytmupi.ezytmupipayment.model.TransactionDetails;
 import com.ezytmupi.ezytmupipayment.models.PaymentApp;
-import com.ezytmupi.ezytmupipayment.models.TransactionDetails;
+
 
 import org.jetbrains.annotations.NotNull;
 
@@ -27,7 +29,7 @@ import java.util.Random;
 
 
 
-public class MainActivity extends AppCompatActivity implements PaymentUpiStatusListener {
+public class MainActivity extends AppCompatActivity implements PaymentStatusListener {
 
     private ImageView imageView;
 
