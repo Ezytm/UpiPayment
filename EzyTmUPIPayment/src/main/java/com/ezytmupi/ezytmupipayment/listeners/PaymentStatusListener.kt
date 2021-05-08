@@ -1,4 +1,4 @@
-package com.ezytmupi.ezytmupipayment.listener
+package com.ezytmupi.ezytmupipayment.listeners
 
 import com.ezytmupi.ezytmupipayment.model.TransactionDetails
 

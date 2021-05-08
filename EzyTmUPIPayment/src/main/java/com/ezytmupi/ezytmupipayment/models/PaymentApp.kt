@@ -1,4 +1,4 @@
-package com.ezytmupi.ezytmupipayment.model
+package com.ezytmupi.ezytmupipayment.models
 
 @Suppress("SpellCheckingInspection")
 enum class PaymentApp(val packageName: String) {

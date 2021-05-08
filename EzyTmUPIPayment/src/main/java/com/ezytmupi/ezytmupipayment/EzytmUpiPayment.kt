@@ -11,9 +11,9 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.OnLifecycleEvent
 import com.ezytmupi.ezytmupipayment.EzytmUpiPayment.Builder
 import com.ezytmupi.ezytmupipayment.exception.AppNotFoundException
-import com.ezytmupi.ezytmupipayment.listener.PaymentStatusListener
+import com.ezytmupi.ezytmupipayment.listeners.PaymentStatusListener
 import com.ezytmupi.ezytmupipayment.model.Payment
-import com.ezytmupi.ezytmupipayment.model.PaymentApp
+import com.ezytmupi.ezytmupipayment.models.PaymentApp
 import com.ezytmupi.ezytmupipayment.PaymentUiActivity
 
 

@@ -16,9 +16,11 @@ import android.widget.Toast;
 
 
 import com.ezytmupi.ezytmupipayment.EzytmUpiPayment;
-import com.ezytmupi.ezytmupipayment.listener.PaymentStatusListener;
-import com.ezytmupi.ezytmupipayment.model.PaymentApp;
+
+import com.ezytmupi.ezytmupipayment.listeners.PaymentStatusListener;
+import com.ezytmupi.ezytmupipayment.models.PaymentApp;
 import com.ezytmupi.ezytmupipayment.model.TransactionDetails;
+
 
 import org.jetbrains.annotations.NotNull;
 
