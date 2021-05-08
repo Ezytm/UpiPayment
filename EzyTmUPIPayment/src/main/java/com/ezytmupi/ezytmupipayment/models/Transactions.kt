@@ -1,4 +1,4 @@
-package com.ezytmupi.ezytmupipayment.model
+package com.ezytmupi.ezytmupipayment.models
 
 data class TransactionDetails(
 		val transactionId: String?,

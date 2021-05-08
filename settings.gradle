@@ -1,1 +1,3 @@
-include ':app',':EzyTmUPIPayment'
+include ':EzyTmUPIPayment'
+include ':app'
+rootProject.name = "EzytmUpi"

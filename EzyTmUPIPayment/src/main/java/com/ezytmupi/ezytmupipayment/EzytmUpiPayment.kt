@@ -11,10 +11,10 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.OnLifecycleEvent
 import com.ezytmupi.ezytmupipayment.EzytmUpiPayment.Builder
 import com.ezytmupi.ezytmupipayment.exception.AppNotFoundException
-import com.ezytmupi.ezytmupipayment.listeners.PaymentStatusListener
-import com.ezytmupi.ezytmupipayment.model.Payment
+import com.ezytmupi.ezytmupipayment.listeners.PaymentUpiStatusListener
 import com.ezytmupi.ezytmupipayment.models.PaymentApp
-import com.ezytmupi.ezytmupipayment.PaymentUiActivity
+import com.ezytmupi.ezytmupipayment.uiactivity.PaymentUpiActivity
+import com.ezytmupi.ezytmupipayment.models.PaymentUpi
 
 
 /**
@@ -24,7 +24,7 @@ import com.ezytmupi.ezytmupipayment.PaymentUiActivity
 @Suppress("unused")
 class EzytmUpiPayment constructor(
 		private val mActivity: Activity,
-		private val mPayment: Payment
+		private val mPayment: PaymentUpi
 ) {
 
 	@VisibleForTesting
@@ -56,8 +56,8 @@ class EzytmUpiPayment constructor(
 	 */
 	fun startPayment() {
 		// Create Payment Activity Intent
-		val payIntent = Intent(mActivity, PaymentUiActivity::class.java).apply {
-			putExtra(PaymentUiActivity.EXTRA_KEY_PAYMENT, mPayment)
+		val payIntent = Intent(mActivity, PaymentUpiActivity::class.java).apply {
+			putExtra(PaymentUpiActivity.EXTRA_KEY_PAYMENT, mPayment)
 		}
 
 		// Start Payment Activity
@@ -69,7 +69,7 @@ class EzytmUpiPayment constructor(
 	 *
 	 * @param mListener Implementation of PaymentStatusListener
 	 */
-	fun setPaymentStatusListener(mListener: PaymentStatusListener) {
+	fun setPaymentStatusListener(mListener: PaymentUpiStatusListener) {
 		Singleton.listener = mListener
 	}
 
@@ -206,7 +206,7 @@ class EzytmUpiPayment constructor(
 		fun build(): EzytmUpiPayment {
 			validate()
 
-			val payment = Payment(
+			val payment = PaymentUpi(
 					currency = "INR",
 					vpa = payeeVpa!!,
 					name = payeeName!!,

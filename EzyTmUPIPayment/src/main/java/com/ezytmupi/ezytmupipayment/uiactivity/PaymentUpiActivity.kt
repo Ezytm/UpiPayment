@@ -1,4 +1,4 @@
-package com.ezytmupi.ezytmupipayment
+package com.ezytmupi.ezytmupipayment.uiactivity
 
 import android.content.Intent
 import android.net.Uri
@@ -9,20 +9,21 @@ import androidx.appcompat.app.AppCompatActivity
 import com.ezytmupi.ezytmupipayment.R
 import com.ezytmupi.ezytmupipayment.Singleton
 import com.ezytmupi.ezytmupipayment.exception.AppNotFoundException
-import com.ezytmupi.ezytmupipayment.model.Payment
-import com.ezytmupi.ezytmupipayment.model.TransactionDetails
-import com.ezytmupi.ezytmupipayment.model.TransactionStatus
+
+import com.ezytmupi.ezytmupipayment.models.PaymentUpi
+import com.ezytmupi.ezytmupipayment.models.TransactionDetails
+import com.ezytmupi.ezytmupipayment.models.TransactionStatus
 import java.util.*
 
-class PaymentUiActivity : AppCompatActivity() {
+class PaymentUpiActivity : AppCompatActivity() {
 
-	private lateinit var payment: Payment
+	private lateinit var payment: PaymentUpi
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		setContentView(R.layout.activity_upipay)
 
-		payment = (intent.getSerializableExtra(EXTRA_KEY_PAYMENT) as Payment?)
+		payment = (intent.getSerializableExtra(EXTRA_KEY_PAYMENT) as PaymentUpi?)
 				?: throw IllegalStateException("Unable to parse payment details")
 
 		// Set Parameters for UPI

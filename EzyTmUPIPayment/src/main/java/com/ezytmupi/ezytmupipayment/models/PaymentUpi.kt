@@ -1,8 +1,8 @@
-package com.ezytmupi.ezytmupipayment.model
+package com.ezytmupi.ezytmupipayment.models
 
 import java.io.Serializable
 
-data class Payment(
+data class PaymentUpi(
 		var currency: String,
 		var vpa: String,
 		var name: String,

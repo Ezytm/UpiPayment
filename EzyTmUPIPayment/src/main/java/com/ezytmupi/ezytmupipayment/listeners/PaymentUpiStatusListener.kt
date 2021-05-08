@@ -1,8 +1,8 @@
 package com.ezytmupi.ezytmupipayment.listeners
 
-import com.ezytmupi.ezytmupipayment.model.TransactionDetails
+import com.ezytmupi.ezytmupipayment.models.TransactionDetails
 
-interface PaymentStatusListener {
+interface PaymentUpiStatusListener  {
 	fun onTransactionCompleted(transactionDetails: TransactionDetails)
 	fun onTransactionCancelled()
 }
