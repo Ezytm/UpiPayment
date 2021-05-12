@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.annotation.SuppressLint;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -16,10 +17,12 @@ import android.widget.Toast;
 
 
 import com.ezytmupi.ezytmupipayment.EzytmUpiPayment;
+
 import com.ezytmupi.ezytmupipayment.listeners.PaymentUpiStatusListener;
 
 import com.ezytmupi.ezytmupipayment.models.TransactionDetails;
 import com.ezytmupi.ezytmupipayment.models.PaymentApp;
+
 
 
 import org.jetbrains.annotations.NotNull;
@@ -51,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements PaymentUpiStatusL
 
 
     private EzytmUpiPayment easyUpiPayment;
-
+    //private Walletcall walletcall;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,13 +72,12 @@ public class MainActivity extends AppCompatActivity implements PaymentUpiStatusL
 
         String transactionId = "TID" + System.currentTimeMillis();
 
+        Log.e("",""+transactionId);
         radioAppChoice = findViewById(R.id.radioAppChoice);
     }
 
     @SuppressLint("NonConstantResourceId")
     private void pay() {
-
-
         Calendar c = Calendar.getInstance();
         int time = c.get(Calendar.MILLISECOND) * 60 * 60 * 60;
         String transactionId = "TID" + time + generateID();
@@ -104,51 +106,38 @@ public class MainActivity extends AppCompatActivity implements PaymentUpiStatusL
             toast("Error: " + exception.getMessage());
         }
 
-//
-//        // START PAYMENT INITIALIZATION
-//        EzytmUpiPayment.Builder builder = new EzytmUpiPayment.Builder(this)
-//                .with(paymentApp)
-//                .setPayeeVpa("in.kishanchoudhary@okicici")
-//                .setPayeeName("payment")
-//                .setTransactionId(transactionId)
-//                .setTransactionRefId(transactionRefId)
-//              //  .setPayeeMerchantCode(payeeMerchantCode)
-//                .setDescription("test")
-//                .setAmount("1.00");
-//        // END INITIALIZATION
-//
+
+//        Walletcall.Builder builder1 = new Walletcall.Builder(MainActivity.this)
+//                .setuserid("3001")
+//                .setToken("Sa")
+//                .setVendorUpiID("101")
+//                .setOurRefID("57568778")
+//                .setRetailerUpiID("9928684010@upi")
+//                .setUpiResponse("")
+//                .setUpiTxnStatus("1")
+//                .setAmount("10");
 //        try {
-//            // Build instance
-//            ezytmUpiPayment = builder.build();
+//            walletcall = builder1.build();
 //
 //            // Register Listener for Events
-//            ezytmUpiPayment.setPaymentStatusListener(this);
+//            walletcall.setPaymentStatusListener(this);
 //
 //            // Start payment / transaction
-//            ezytmUpiPayment.startPayment();
+//            walletcall.startPayment();
 //        } catch (Exception exception) {
 //            exception.printStackTrace();
-//            toast("Error: " + exception.getMessage());
+//            toast("Error:    " + exception.getMessage());
 //        }
+
+
+
     }
 
 //    @Override
-//    public void onTransactionCompleted(TransactionDetails transactionDetails) {
-//        // Transaction Completed
-//        Log.d("TransactionDetails", transactionDetails.toString());
-//        statusView.setText(transactionDetails.toString());
+//    public void onappnotfoundCancelled() {
+//        // Payment Cancelled by User
+//        toast("No UPI app exists on this device to perform this transaction.");
 //
-//        switch (transactionDetails.getTransactionStatus()) {
-//            case SUCCESS:
-//                onTransactionSuccess();
-//                break;
-//            case FAILURE:
-//                onTransactionFailed();
-//                break;
-//            case SUBMITTED:
-//                onTransactionSubmitted();
-//                break;
-//        }
 //    }
 
     @Override
@@ -195,4 +184,9 @@ public class MainActivity extends AppCompatActivity implements PaymentUpiStatusL
     public void onTransactionCompleted(@NotNull TransactionDetails transactionDetails) {
 
     }
+
+//    @Override
+//    public void onwalletCompleted(@NotNull WalletResponse transactionDetails) {
+//        Toast.makeText(MainActivity.this, ""+transactionDetails.getMESSAGE(), Toast.LENGTH_SHORT).show();
+//    }
 }

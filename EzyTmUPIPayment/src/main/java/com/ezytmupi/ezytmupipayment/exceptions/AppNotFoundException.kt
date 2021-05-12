@@ -1,5 +1,4 @@
 package com.ezytmupi.ezytmupipayment.exception
 
-class AppNotFoundException(appPackage: String?) : Exception("""
-    No UPI app${appPackage?.let { " with package name '$it'" } ?: ""} exists on this device to perform this transaction.
-""".trimIndent())
+class AppNotFoundException(appPackage: String?) : Exception(
+        "No UPI app exists on this device to perform this transaction.")

@@ -58,11 +58,9 @@ class PaymentUpiActivity : AppCompatActivity() {
 		if (paymentIntent.resolveActivity(packageManager) != null) {
 			startActivityForResult(appChooser, PAYMENT_REQUEST)
 		} else {
-			Toast.makeText(
-					this,
-					"No UPI app found! Please Install to Proceed!",
-					Toast.LENGTH_SHORT).show()
+			//Toast.makeText(this, "No UPI app found! Please Install to Proceed!", Toast.LENGTH_SHORT).show()
 			throwOnAppNotFound()
+			finish()
 		}
 	}
 
@@ -127,13 +125,20 @@ class PaymentUpiActivity : AppCompatActivity() {
 
 	@JvmSynthetic
 	internal fun throwOnAppNotFound() {
+		Log.e("check", "  ef       " + payment.defaultPackage)
 		Log.e(TAG, "No UPI app found on device.")
-		throw AppNotFoundException(payment.defaultPackage)
+		callbackappnotfoundCancelled()
+	//	throw AppNotFoundException(payment.defaultPackage)
 	}
 
 	@JvmSynthetic
 	internal fun callbackTransactionCancelled() {
 		Singleton.listener?.onTransactionCancelled()
+	}
+
+	@JvmSynthetic
+	internal fun callbackappnotfoundCancelled() {
+		Singleton.listener?.onappnotfoundCancelled()
 	}
 
 	@JvmSynthetic

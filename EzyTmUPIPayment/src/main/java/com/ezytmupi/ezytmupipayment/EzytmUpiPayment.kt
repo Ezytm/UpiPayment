@@ -22,10 +22,7 @@ import com.ezytmupi.ezytmupipayment.models.PaymentUpi
  * Use [Builder] to create a new instance.
  */
 @Suppress("unused")
-class EzytmUpiPayment constructor(
-		private val mActivity: Activity,
-		private val mPayment: PaymentUpi
-) {
+class EzytmUpiPayment constructor(private val mActivity: Activity, private val mPayment: PaymentUpi) {
 
 	@VisibleForTesting
 	@get:JvmSynthetic
@@ -45,7 +42,7 @@ class EzytmUpiPayment constructor(
 		} else {
 			Log.w(TAG, """
                 Current Activity isn't AppCompatActivity.
-                You'll need to call EasyUpiPayment#detachListener() to remove listener.
+                You'll need to call EzytmUpiPayment#detachListener() to remove listener.
             """.trimIndent())
 		}
 	}
@@ -280,7 +277,7 @@ class EzytmUpiPayment constructor(
 	}
 
 	companion object {
-		const val TAG = "EasyUpiPayment"
+		const val TAG = "EzytmUpiPayment"
 	}
 }
 

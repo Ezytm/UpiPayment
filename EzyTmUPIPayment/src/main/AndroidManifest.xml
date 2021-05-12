@@ -11,8 +11,14 @@
     </queries>
 
     <application>
+
         <activity
             android:name=".uiactivity.PaymentUpiActivity"
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
+
+
+        <activity
+            android:name=".uiactivity.WalletActivity"
             android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
     </application>
 
