@@ -10,11 +10,18 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.OnLifecycleEvent
 import com.ezytmupi.ezytmupipayment.EzytmUpiPayment.Builder
+import com.ezytmupi.ezytmupipayment.Network.CommonUrl
+import com.ezytmupi.ezytmupipayment.Network.IGoogleApi
 import com.ezytmupi.ezytmupipayment.exception.AppNotFoundException
 import com.ezytmupi.ezytmupipayment.listeners.PaymentUpiStatusListener
-import com.ezytmupi.ezytmupipayment.models.PaymentApp
+import com.ezytmupi.ezytmupipayment.models.*
 import com.ezytmupi.ezytmupipayment.uiactivity.PaymentUpiActivity
-import com.ezytmupi.ezytmupipayment.models.PaymentUpi
+import com.ezytmupi.ezytmupipayment.uiactivity.WalletActivity
+import com.google.gson.Gson
+import org.json.JSONObject
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 
 /**
@@ -22,7 +29,7 @@ import com.ezytmupi.ezytmupipayment.models.PaymentUpi
  * Use [Builder] to create a new instance.
  */
 @Suppress("unused")
-class EzytmUpiPayment constructor(private val mActivity: Activity, private val mPayment: PaymentUpi) {
+class EzytmUpiPayment constructor(private val mActivity: Activity, private val mPayment: WalletRequestValue) {
 
 	@VisibleForTesting
 	@get:JvmSynthetic
@@ -54,12 +61,14 @@ class EzytmUpiPayment constructor(private val mActivity: Activity, private val m
 	fun startPayment() {
 		// Create Payment Activity Intent
 		val payIntent = Intent(mActivity, PaymentUpiActivity::class.java).apply {
-			putExtra(PaymentUpiActivity.EXTRA_KEY_PAYMENT, mPayment)
-		}
+			putExtra(PaymentUpiActivity.EXTRA_KEY_PAYMENTREQUEST, mPayment) }
 
 		// Start Payment Activity
 		mActivity.startActivity(payIntent)
 	}
+
+
+
 
 	/**
 	 * Sets the PaymentStatusListener.
@@ -93,25 +102,90 @@ class EzytmUpiPayment constructor(private val mActivity: Activity, private val m
 		var paymentApp: PaymentApp = PaymentApp.ALL
 
 		@set:JvmSynthetic
-		var payeeVpa: String? = null
+		var userid: String? = null
 
 		@set:JvmSynthetic
-		var payeeName: String? = null
+		var Token: String? = null
 
 		@set:JvmSynthetic
-		var payeeMerchantCode: String? = null
+		var ClientRefId: String? = null
 
 		@set:JvmSynthetic
-		var transactionId: String? = null
+		var RetailerUserID: String? = null
 
 		@set:JvmSynthetic
-		var transactionRefId: String? = null
+		var RetailerUpiID: String? = null
 
 		@set:JvmSynthetic
-		var description: String? = null
+		var PhoneInfo: String? = null
+
+		@set:JvmSynthetic
+		var IPadd: String? = null
 
 		@set:JvmSynthetic
 		var amount: String? = null
+
+		@JvmOverloads
+		fun with(paymentApp: PaymentApp = PaymentApp.ALL): Builder = apply {
+			this.paymentApp = paymentApp
+		}
+
+		fun setuserid(id: String): Builder = apply { userid = id }
+
+		fun setToken(token: String): Builder = apply { Token = token }
+
+		fun setClientRefId(clientRefId: String): Builder = apply { this.ClientRefId = clientRefId }
+
+		fun setRetailerUserID(retailerUserID: String): Builder = apply { this.RetailerUserID = retailerUserID }
+
+		fun setRetailerUpiID(retailerupiid: String): Builder = apply { this.RetailerUpiID = retailerupiid }
+
+		fun setPhoneInfo(phoneInfo: String): Builder = apply { this.PhoneInfo = phoneInfo }
+
+		fun setIPadd(iPadd: String): Builder = apply { this.IPadd = iPadd }
+
+		fun setAmount(amount: String): Builder = apply { this.amount = amount }
+
+		@Throws(IllegalStateException::class, AppNotFoundException::class)
+		fun build(): EzytmUpiPayment {
+			validate()
+
+			val payment = WalletRequestValue(
+					userid = userid!!,
+					UToken = Token!!,
+					ClientRefId = ClientRefId!!,
+					RetailerUserID = RetailerUserID!!,
+					RetailerUpiID = RetailerUpiID!!,
+					PhoneInfo = PhoneInfo!!,
+					IPadd = IPadd!!,
+					amount = amount!!,
+					defaultPackage = if (paymentApp != PaymentApp.ALL) paymentApp.packageName else null
+			)
+			return EzytmUpiPayment(activity, payment)
+		}
+
+
+
+//		@set:JvmSynthetic
+//		var payeeVpa: String? = null
+//
+//		@set:JvmSynthetic
+//		var payeeName: String? = null
+//
+//		@set:JvmSynthetic
+//		var payeeMerchantCode: String? = null
+//
+//		@set:JvmSynthetic
+//		var transactionId: String? = null
+//
+//		@set:JvmSynthetic
+//		var transactionRefId: String? = null
+//
+//		@set:JvmSynthetic
+//		var description: String? = null
+//
+//		@set:JvmSynthetic
+//		var amount: String? = null
 
 		/**
 		 * Sets default payment app for transaction.
@@ -121,101 +195,102 @@ class EzytmUpiPayment constructor(private val mActivity: Activity, private val m
 		 *
 		 * @return this, for chaining.
 		 */
-		@JvmOverloads
-		fun with(paymentApp: PaymentApp = PaymentApp.ALL): Builder = apply {
-			this.paymentApp = paymentApp
-		}
-
-		/**
-		 * Sets the Payee VPA (e.g. example@vpa, 1234XXX@upi).
-		 *
-		 * @param vpa Payee VPA address (e.g. example@vpa, 1234XXX@upi).
-		 *
-		 * @return this, for chaining.
-		 */
-		fun setPayeeVpa(vpa: String): Builder = apply { payeeVpa = vpa }
-
-		/**
-		 * Sets the Payee Name.
-		 *
-		 * @param name Payee Name.
-		 *
-		 * @return this, for chaining.
-		 */
-		fun setPayeeName(name: String): Builder = apply { payeeName = name }
-
-		/**
-		 * Sets the Merchant Code. If present it should be passed.
-		 *
-		 * @param merchantCode Payee Merchant code if present it should be passed.
-		 *
-		 * @return this, for chaining.
-		 */
-		fun setPayeeMerchantCode(merchantCode: String): Builder = apply {
-			this.payeeMerchantCode = merchantCode
-		}
-
-		/**
-		 * Sets the Transaction ID. This field is used in Merchant Payments generated by PSPs.
-		 *
-		 * @param id field is used in Merchant Payments generated by PSPs.
-		 *
-		 * @return this, for chaining.
-		 */
-		fun setTransactionId(id: String): Builder = apply { this.transactionId = id }
-
-		/**
-		 * Sets the Transaction Reference ID. Transaction reference ID. This could be order number,
-		 * subscription number, Bill ID, booking ID, insurance renewal reference, etc.
-		 * Needed for merchant transactions and dynamic URL generation.
-		 *
-		 * @param refId field is used in Merchant Payments generated by PSPs.
-		 *
-		 * @return this, for chaining.
-		 */
-		fun setTransactionRefId(refId: String): Builder = apply { this.transactionRefId = refId }
-
-		/**
-		 * Sets the Description. It have to provide valid small note or description about payment.
-		 * for e.g. For Food
-		 *
-		 * @param description field have to provide valid small note or description about payment.
-		 * for e.g. For Food, For Payment at Shop XYZ
-		 *
-		 * @return this, for chaining.
-		 */
-		fun setDescription(description: String): Builder = apply { this.description = description }
-
-		/**
-		 * Sets the Amount in INR. (Format should be decimal e.g. 14.88)
-		 *
-		 * @param amount field takes amount in String decimal format (xx.xx) to be paid.
-		 * For e.g. 90.88 will pay Rs. 90.88.
-		 *
-		 * @return this, for chaining.
-		 */
-		fun setAmount(amount: String): Builder = apply { this.amount = amount }
+//		@JvmOverloads
+//		fun with(paymentApp: PaymentApp = PaymentApp.ALL): Builder = apply {
+//			this.paymentApp = paymentApp
+//		}
+//
+//		/**
+//		 * Sets the Payee VPA (e.g. example@vpa, 1234XXX@upi).
+//		 *
+//		 * @param vpa Payee VPA address (e.g. example@vpa, 1234XXX@upi).
+//		 *
+//		 * @return this, for chaining.
+//		 */
+//		fun setPayeeVpa(vpa: String): Builder = apply { payeeVpa = vpa }
+//
+//		/**
+//		 * Sets the Payee Name.
+//		 *
+//		 * @param name Payee Name.
+//		 *
+//		 * @return this, for chaining.
+//		 */
+//		fun setPayeeName(name: String): Builder = apply { payeeName = name }
+//
+//		/**
+//		 * Sets the Merchant Code. If present it should be passed.
+//		 *
+//		 * @param merchantCode Payee Merchant code if present it should be passed.
+//		 *
+//		 * @return this, for chaining.
+//		 */
+//		fun setPayeeMerchantCode(merchantCode: String): Builder = apply {
+//			this.payeeMerchantCode = merchantCode
+//		}
+//
+//		/**
+//		 * Sets the Transaction ID. This field is used in Merchant Payments generated by PSPs.
+//		 *
+//		 * @param id field is used in Merchant Payments generated by PSPs.
+//		 *
+//		 * @return this, for chaining.
+//		 */
+//		fun setTransactionId(id: String): Builder = apply { this.transactionId = id }
+//
+//		/**
+//		 * Sets the Transaction Reference ID. Transaction reference ID. This could be order number,
+//		 * subscription number, Bill ID, booking ID, insurance renewal reference, etc.
+//		 * Needed for merchant transactions and dynamic URL generation.
+//		 *
+//		 * @param refId field is used in Merchant Payments generated by PSPs.
+//		 *
+//		 * @return this, for chaining.
+//		 */
+//		fun setTransactionRefId(refId: String): Builder = apply { this.transactionRefId = refId }
+//
+//		/**
+//		 * Sets the Description. It have to provide valid small note or description about payment.
+//		 * for e.g. For Food
+//		 *
+//		 * @param description field have to provide valid small note or description about payment.
+//		 * for e.g. For Food, For Payment at Shop XYZ
+//		 *
+//		 * @return this, for chaining.
+//		 */
+//		fun setDescription(description: String): Builder = apply { this.description = description }
+//
+//		/**
+//		 * Sets the Amount in INR. (Format should be decimal e.g. 14.88)
+//		 *
+//		 * @param amount field takes amount in String decimal format (xx.xx) to be paid.
+//		 * For e.g. 90.88 will pay Rs. 90.88.
+//		 *
+//		 * @return this, for chaining.
+//		 */
+//		fun setAmount(amount: String): Builder = apply { this.amount = amount }
 
 		/**
 		 * Build the [EzytmUpiPayment] object.
 		 */
-		@Throws(IllegalStateException::class, AppNotFoundException::class)
-		fun build(): EzytmUpiPayment {
-			validate()
 
-			val payment = PaymentUpi(
-					currency = "INR",
-					vpa = payeeVpa!!,
-					name = payeeName!!,
-					payeeMerchantCode = payeeMerchantCode,
-					txnId = transactionId!!,
-					txnRefId = transactionRefId!!,
-					description = description!!,
-					amount = amount!!,
-					defaultPackage = if (paymentApp != PaymentApp.ALL) paymentApp.packageName else null
-			)
-			return EzytmUpiPayment(activity, payment)
-		}
+//		@Throws(IllegalStateException::class, AppNotFoundException::class)
+//		fun build(): EzytmUpiPayment {
+//			validate()
+//
+//			val payment = PaymentUpi(
+//					currency = "INR",
+//					vpa = payeeVpa!!,
+//					name = payeeName!!,
+//					payeeMerchantCode = payeeMerchantCode,
+//					txnId = transactionId!!,
+//					txnRefId = transactionRefId!!,
+//					description = description!!,
+//					amount = amount!!,
+//					defaultPackage = if (paymentApp != PaymentApp.ALL) paymentApp.packageName else null
+//			)
+//			return EzytmUpiPayment(activity, payment)
+//		}
 
 		private fun validate() {
 			if (paymentApp != PaymentApp.ALL) {
@@ -224,32 +299,29 @@ class EzytmUpiPayment constructor(private val mActivity: Activity, private val m
 				}
 			}
 
-			payeeVpa.run {
+			userid.run {
 				checkNotNull(this) { "Must call setPayeeVpa() before build()." }
-				check(this.matches("""^[\w-.]+@([\w-])+""".toRegex())) {
-					"Payee VPA address should be valid (For e.g. example@vpa)"
-				}
+				check(this.isNotBlank()) { "Payee VPA address should be valid (For e.g. example@vpa)" }
 			}
 
-			payeeMerchantCode?.let {
-				check(it.isNotBlank()) { "Merchant Code Should be Valid!" }
-			}
-
-			transactionId.run {
+			Token.run {
 				checkNotNull(this) { "Must call setTransactionId() before build" }
 				check(this.isNotBlank()) { "Transaction ID Should be Valid!" }
 			}
 
-			transactionRefId.run {
+			ClientRefId.run {
 				checkNotNull(this) { "Must call setTransactionRefId() before build" }
 				check(this.isNotBlank()) { "RefId Should be Valid!" }
 			}
 
-			payeeName.run {
+			RetailerUpiID.run {
 				checkNotNull(this) { "Must call setPayeeName() before build()." }
 				check(this.isNotBlank()) { "Payee name Should be Valid!" }
 			}
-
+			RetailerUserID.run {
+				checkNotNull(this) { "Must call setDescription() before build()." }
+				check(this.isNotBlank()) { "Description Should be Valid!" }
+			}
 			amount.run {
 				checkNotNull(this) { "Must call setAmount() before build()." }
 				check(this.matches("""\d+\.\d*""".toRegex())) {
@@ -257,10 +329,7 @@ class EzytmUpiPayment constructor(private val mActivity: Activity, private val m
 				}
 			}
 
-			description.run {
-				checkNotNull(this) { "Must call setDescription() before build()." }
-				check(this.isNotBlank()) { "Description Should be Valid!" }
-			}
+
 		}
 
 		/**

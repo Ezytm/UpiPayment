@@ -20,6 +20,48 @@
             android:textColor="#000000"
             android:textSize="18sp" />
 
+        <EditText
+            android:id="@+id/eduserid"
+            android:hint="Enter user id"
+            android:textColor="@android:color/black"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"></EditText>
+
+
+        <EditText
+            android:layout_marginTop="5dp"
+            android:id="@+id/edtoken"
+            android:hint="Enter Token"
+            android:textColor="@android:color/black"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"></EditText>
+
+        <EditText
+            android:layout_marginTop="5dp"
+            android:id="@+id/edclientrefid"
+            android:hint="Enter client ref id"
+            android:textColor="@android:color/black"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"></EditText>
+
+        <EditText
+            android:layout_marginTop="5dp"
+            android:id="@+id/edupiid"
+            android:hint="Enter upi id"
+            android:textColor="@android:color/black"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"></EditText>
+
+
+        <EditText
+            android:layout_marginTop="5dp"
+            android:id="@+id/edamount"
+            android:hint="Enter amount"
+            android:inputType="number"
+            android:textColor="@android:color/black"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"></EditText>
+
         <RadioGroup
             android:visibility="gone"
             android:id="@+id/radioAppChoice"

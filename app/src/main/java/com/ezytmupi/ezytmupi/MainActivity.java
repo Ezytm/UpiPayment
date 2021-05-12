@@ -22,7 +22,7 @@ import com.ezytmupi.ezytmupipayment.listeners.PaymentUpiStatusListener;
 
 import com.ezytmupi.ezytmupipayment.models.TransactionDetails;
 import com.ezytmupi.ezytmupipayment.models.PaymentApp;
-
+import com.ezytmupi.ezytmupipayment.models.WalletResponse;
 
 
 import org.jetbrains.annotations.NotNull;
@@ -42,11 +42,13 @@ public class MainActivity extends AppCompatActivity implements PaymentUpiStatusL
 
     private RadioGroup radioAppChoice;
 
-    private EditText fieldPayeeVpa;
-    private EditText fieldPayeeName;
-    private EditText fieldPayeeMerchantCode;
-    private EditText fieldTransactionId;
-    private EditText fieldTransactionRefId;
+    private EditText eduserid;
+    private EditText edtoken;
+    private EditText edclientrefid;
+    private EditText edupiid;
+    private EditText edamount;
+
+
     private EditText fieldDescription;
     private EditText fieldAmount;
 
@@ -66,6 +68,20 @@ public class MainActivity extends AppCompatActivity implements PaymentUpiStatusL
     }
 
     private void initViews() {
+
+        edupiid = findViewById(R.id.edupiid);
+        eduserid = findViewById(R.id.eduserid);
+        edclientrefid = findViewById(R.id.edclientrefid);
+        edtoken = findViewById(R.id.edtoken);
+        edamount = findViewById(R.id.edamount);
+
+        eduserid.setText("3001");
+        edtoken.setText("sa");
+        edclientrefid.setText("1");
+        edupiid.setText("9928684010@upi");
+        edamount.setText("1");
+
+
         imageView = findViewById(R.id.imageView);
         statusView = findViewById(R.id.textView_status);
         payButton = findViewById(R.id.button_pay);
@@ -84,21 +100,20 @@ public class MainActivity extends AppCompatActivity implements PaymentUpiStatusL
         PaymentApp paymentApp = PaymentApp.ALL;
         EzytmUpiPayment.Builder builder = new EzytmUpiPayment.Builder(MainActivity.this)
                 .with(paymentApp)
-                .setPayeeVpa("in.kishanchoudhary@okicici")
-                .setPayeeName("name")
-                .setTransactionId(transactionId)
-                .setTransactionRefId(transactionId)
-                .setDescription("remak")
-                .setAmount(1 + ".00");
+                .setuserid(eduserid.getText().toString().trim())
+                .setToken(edtoken.getText().toString().trim())
+                .setClientRefId(edclientrefid.getText().toString().trim())
+                .setRetailerUpiID(edupiid.getText().toString().trim())
+                .setRetailerUserID("7976155877")
+                .setPhoneInfo("53563463544")
+                .setIPadd("108:23:2:01")
+                .setAmount(edamount.getText().toString().trim() + ".00");
         //     END INITIALIZATION
-
 
         try {
             easyUpiPayment = builder.build();
-
             // Register Listener for Events
             easyUpiPayment.setPaymentStatusListener(this);
-
             // Start payment / transaction
             easyUpiPayment.startPayment();
         } catch (Exception exception) {
@@ -133,12 +148,12 @@ public class MainActivity extends AppCompatActivity implements PaymentUpiStatusL
 
     }
 
-//    @Override
-//    public void onappnotfoundCancelled() {
-//        // Payment Cancelled by User
-//        toast("No UPI app exists on this device to perform this transaction.");
-//
-//    }
+    @Override
+    public void onappnotfoundCancelled() {
+        // Payment Cancelled by User
+        toast("No UPI app exists on this device to perform this transaction.");
+
+    }
 
     @Override
     public void onTransactionCancelled() {
@@ -185,8 +200,9 @@ public class MainActivity extends AppCompatActivity implements PaymentUpiStatusL
 
     }
 
-//    @Override
-//    public void onwalletCompleted(@NotNull WalletResponse transactionDetails) {
-//        Toast.makeText(MainActivity.this, ""+transactionDetails.getMESSAGE(), Toast.LENGTH_SHORT).show();
-//    }
+
+    @Override
+    public void onwalletCompleted(@NotNull WalletResponse transactionDetails) {
+        Toast.makeText(MainActivity.this, ""+transactionDetails.getMESSAGE(), Toast.LENGTH_SHORT).show();
+    }
 }

@@ -6,38 +6,140 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.ezytmupi.ezytmupipayment.Network.CommonUrl
+import com.ezytmupi.ezytmupipayment.Network.IGoogleApi
 import com.ezytmupi.ezytmupipayment.R
 import com.ezytmupi.ezytmupipayment.Singleton
 import com.ezytmupi.ezytmupipayment.exception.AppNotFoundException
+import com.ezytmupi.ezytmupipayment.models.*
+import com.google.gson.Gson
+import org.json.JSONObject
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
-import com.ezytmupi.ezytmupipayment.models.PaymentUpi
-import com.ezytmupi.ezytmupipayment.models.TransactionDetails
-import com.ezytmupi.ezytmupipayment.models.TransactionStatus
 import java.util.*
 
 class PaymentUpiActivity : AppCompatActivity() {
 
-	private lateinit var payment: PaymentUpi
-
+	lateinit var payment: PaymentUpi
+	lateinit var mservice: IGoogleApi
+	private lateinit var wallet: WalletRequestValue
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		setContentView(R.layout.activity_upipay)
 
-		payment = (intent.getSerializableExtra(EXTRA_KEY_PAYMENT) as PaymentUpi?)
+
+		wallet = (intent.getSerializableExtra(PaymentUpiActivity.EXTRA_KEY_PAYMENTREQUEST) as WalletRequestValue?)
 				?: throw IllegalStateException("Unable to parse payment details")
+
+//		payment = (intent.getSerializableExtra(EXTRA_KEY_PAYMENT) as PaymentUpi?)
+//				?: throw IllegalStateException("Unable to parse payment details")
+
+//		// Set Parameters for UPI
+//		val paymentUri = Uri.Builder().apply {
+//			with(payment) {
+//				scheme("upi").authority("pay")
+//				appendQueryParameter("pa", vpa)
+//				appendQueryParameter("pn", name)
+//				appendQueryParameter("tid", txnId)
+//				payeeMerchantCode?.let { appendQueryParameter("mc", it) }
+//				appendQueryParameter("tr", txnRefId)
+//				appendQueryParameter("tn", description)
+//				appendQueryParameter("am", amount)
+//				appendQueryParameter("cu", currency)
+//			}
+//		}.build()
+//
+//		// Set Data Intent
+//		val paymentIntent = Intent(Intent.ACTION_VIEW).apply {
+//			data = paymentUri
+//
+//			// Check for Default package
+//			payment.defaultPackage?.let {
+//				`package` = it
+//			}
+//		}
+//
+//		// Show Dialog to user
+//		val appChooser = Intent.createChooser(paymentIntent, "Pay using")
+//
+//		// Check if other UPI apps are exists or not.
+//		if (paymentIntent.resolveActivity(packageManager) != null) {
+//			startActivityForResult(appChooser, PAYMENT_REQUEST)
+//		} else {
+//			//Toast.makeText(this, "No UPI app found! Please Install to Proceed!", Toast.LENGTH_SHORT).show()
+//			throwOnAppNotFound()
+//			finish()
+//		}
+
+		WalletRequest()
+	}
+
+	private fun WalletRequest() {
+		mservice = CommonUrl.getGoogleApi()
+		Log.e("check", "  Kishan11       " + wallet.userid +"  "+wallet.UToken+"    "+wallet.PhoneInfo+"   "+wallet.IPadd)
+		val loginCall: Call<WalletRequestResponse> = mservice.WalletRequest(wallet.userid, wallet.UToken,wallet.amount, wallet.ClientRefId,
+				wallet.RetailerUserID, wallet.RetailerUpiID, wallet.PhoneInfo,wallet.IPadd)
+		loginCall.enqueue(object : Callback<WalletRequestResponse> {
+			override fun onResponse(call: Call<WalletRequestResponse>, response: Response<WalletRequestResponse>) {
+				if (response != null) {
+					val jsonobject: JSONObject = JSONObject(Gson().toJson(response.body()))
+
+
+					if (jsonobject.getString("ERROR").equals("0")) {
+
+						val transactionDetails = response.body()
+						payment = PaymentUpi(
+								currency = "INR",
+								vpa = response.body()!!.VendorUpiID!!,
+								name = response.body()!!.PaymentMode!!!!,
+								payeeMerchantCode = null,
+								txnId = response.body()!!.OurRefID!!,
+								txnRefId = response.body()!!.OurRefID!!!!,
+								description = response.body()!!.PaymentMode!!!!,
+								amount = wallet.amount!!,
+								defaultPackage = wallet.defaultPackage
+						)
+
+						upicall(response.body()!!.VendorUpiID!!,response.body()!!.OurRefID!!,wallet.amount!!,response.body()!!.PaymentMode!!)
+						//	callbackTransactionCompleted(transactionDetails!!)
+					} else if (jsonobject.getString("ERROR").equals("5")) {
+						val transactionDetails = response.body()
+						//	callbackTransactionCompleted(transactionDetails!!)
+						//finish()
+					} else {
+
+					}
+				}
+				else {
+					Log.e("check", "  server error       " + response)
+				}
+			}
+
+			override fun onFailure(call: Call<WalletRequestResponse>, t: Throwable) {
+				Log.e("check", "  error       " + t.message)
+			}
+		})
+	}
+
+	private fun upicall(upiid:String,txnid:String,amt:String,name:String){
+
+//		payment = (this@PaymentUpiActivity.intent.getSerializableExtra(PaymentUpiActivity.EXTRA_KEY_PAYMENT) as PaymentUpi?)
+//		?: throw IllegalStateException("Unable to parse payment details")
 
 		// Set Parameters for UPI
 		val paymentUri = Uri.Builder().apply {
 			with(payment) {
 				scheme("upi").authority("pay")
-				appendQueryParameter("pa", vpa)
+				appendQueryParameter("pa", upiid)
 				appendQueryParameter("pn", name)
-				appendQueryParameter("tid", txnId)
+				appendQueryParameter("tid", txnid)
 				payeeMerchantCode?.let { appendQueryParameter("mc", it) }
-				appendQueryParameter("tr", txnRefId)
-				appendQueryParameter("tn", description)
-				appendQueryParameter("am", amount)
-				appendQueryParameter("cu", currency)
+				appendQueryParameter("tr", txnid)
+				appendQueryParameter("tn", name)
+				appendQueryParameter("am", amt)
+				appendQueryParameter("cu", "INR")
 			}
 		}.build()
 
@@ -63,6 +165,7 @@ class PaymentUpiActivity : AppCompatActivity() {
 			finish()
 		}
 	}
+
 
 	public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
 		super.onActivityResult(requestCode, resultCode, data)
@@ -128,7 +231,7 @@ class PaymentUpiActivity : AppCompatActivity() {
 		Log.e("check", "  ef       " + payment.defaultPackage)
 		Log.e(TAG, "No UPI app found on device.")
 		callbackappnotfoundCancelled()
-	//	throw AppNotFoundException(payment.defaultPackage)
+		//throw AppNotFoundException(payment.defaultPackage)
 	}
 
 	@JvmSynthetic
@@ -149,6 +252,7 @@ class PaymentUpiActivity : AppCompatActivity() {
 	companion object {
 		const val TAG = "PaymentUiActivity"
 		const val PAYMENT_REQUEST = 4400
+		const val EXTRA_KEY_PAYMENTREQUEST = "payment"
 		const val EXTRA_KEY_PAYMENT = "payment"
 	}
 }
