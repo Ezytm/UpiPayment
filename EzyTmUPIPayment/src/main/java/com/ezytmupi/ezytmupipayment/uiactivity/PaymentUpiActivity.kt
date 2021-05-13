@@ -246,8 +246,48 @@ class PaymentUpiActivity : AppCompatActivity() {
 
 	@JvmSynthetic
 	internal fun callbackTransactionCompleted(transactionDetails: TransactionDetails) {
-		Singleton.listener?.onTransactionCompleted(transactionDetails)
+		//Singleton.listener?.onTransactionCompleted(transactionDetails)
+		val res:String = transactionDetails.toString()
+		walletResponse(transactionDetails.transactionId!!,res)
 	}
+
+
+	private fun walletResponse(txn:String,res:String) {
+		val loginCall: Call<WalletResponse> = mservice.WalletResponse(wallet.userid, wallet.UToken, wallet.amount,wallet.RetailerUpiID, wallet.ClientRefId,
+				wallet.RetailerUpiID, res, txn)
+		loginCall.enqueue(object : Callback<WalletResponse> {
+			override fun onResponse(call: Call<WalletResponse>, response: Response<WalletResponse>) {
+				if (response != null) {
+					val jsonobject: JSONObject = JSONObject(Gson().toJson(response.body()))
+
+					if (jsonobject.getString("ERROR").equals("0")) {
+						val transactionDetails = response.body()
+						callbackTransactionCompleted(transactionDetails!!)
+						finish()
+					} else if (jsonobject.getString("ERROR").equals("5")) {
+						val transactionDetails = response.body()
+						callbackTransactionCompleted(transactionDetails!!)
+						finish()
+					} else {
+
+					}
+				}
+				else {
+					Log.e("check", "  server error       " + response)
+				}
+			}
+
+			override fun onFailure(call: Call<WalletResponse>, t: Throwable) {
+				Log.e("check", "  error       " + t.message)
+			}
+		})
+	}
+
+	@JvmSynthetic
+	internal fun callbackTransactionCompleted(transactionDetails: WalletResponse) {
+		Singleton.listener?.onwalletCompleted(transactionDetails)
+	}
+
 
 	companion object {
 		const val TAG = "PaymentUiActivity"
