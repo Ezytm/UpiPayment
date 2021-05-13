@@ -1,11 +1,20 @@
 package com.ezytmupi.ezytmupi;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
@@ -52,11 +61,12 @@ public class MainActivity extends AppCompatActivity implements PaymentUpiStatusL
     private EditText fieldDescription;
     private EditText fieldAmount;
 
-
+    String imei = "";
 
 
     private EzytmUpiPayment easyUpiPayment;
     //private Walletcall walletcall;
+    private static final int MY_CAMERA_REQUEST_CODE = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +77,8 @@ public class MainActivity extends AppCompatActivity implements PaymentUpiStatusL
         payButton.setOnClickListener(v -> pay());
     }
 
+
+    @SuppressLint("MissingPermission")
     private void initViews() {
 
         edupiid = findViewById(R.id.edupiid);
@@ -75,10 +87,10 @@ public class MainActivity extends AppCompatActivity implements PaymentUpiStatusL
         edtoken = findViewById(R.id.edtoken);
         edamount = findViewById(R.id.edamount);
 
-        eduserid.setText("3001");
-        edtoken.setText("sa");
-        edclientrefid.setText("1");
-        edupiid.setText("9928684010@upi");
+        eduserid.setText(getResources().getString(R.string.userid));
+        edtoken.setText(getResources().getString(R.string.tokenid));
+        edclientrefid.setText(getResources().getString(R.string.clientrefid));
+        edupiid.setText(getResources().getString(R.string.upiId));
         edamount.setText("1");
 
 
@@ -90,7 +102,38 @@ public class MainActivity extends AppCompatActivity implements PaymentUpiStatusL
 
         Log.e("",""+transactionId);
         radioAppChoice = findViewById(R.id.radioAppChoice);
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            imei = Settings.Secure.getString(
+                    getApplicationContext().getContentResolver(),
+                    Settings.Secure.ANDROID_ID);
+        }
+        else {
+            final TelephonyManager mTelephony = (TelephonyManager) getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
+
+            if (ActivityCompat.checkSelfPermission(MainActivity.this,Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    Activity#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for Activity#requestPermissions for more details.
+                return;
+            }
+            if (mTelephony.getDeviceId() != null) {
+                imei = mTelephony.getDeviceId();
+            } else {
+                imei = Settings.Secure.getString(
+                        getApplicationContext().getContentResolver(),
+                        Settings.Secure.ANDROID_ID);
+            }
+        }
+
+
     }
+
 
     @SuppressLint("NonConstantResourceId")
     private void pay() {
@@ -105,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements PaymentUpiStatusL
                 .setClientRefId(edclientrefid.getText().toString().trim())
                 .setRetailerUpiID(edupiid.getText().toString().trim())
                 .setRetailerUserID("7976155877")
-                .setPhoneInfo("53563463544")
+                .setPhoneInfo(imei)
                 .setIPadd("108:23:2:01")
                 .setAmount(edamount.getText().toString().trim() + ".00");
         //     END INITIALIZATION

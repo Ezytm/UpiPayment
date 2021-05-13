@@ -1,3 +1,17 @@
 <resources>
     <string name="app_name">EzytmUpi</string>
+
+    <string name="eduser">Enter user id</string>
+    <string name="token">Enter Token</string>
+    <string name="clientid">Enter client ref id</string>
+    <string name="edupi">Enter upi id</string>
+    <string name="edamount">Enter amount</string>
+    <string name="upiapp">UPI App :</string>
+    <string name="buttonpay">Click above button to Pay</string>
+    <string name="PaywithUPI">Pay with UPI</string>
+
+    <string name="userid">3001</string>
+    <string name="tokenid">sa</string>
+    <string name="clientrefid">1</string>
+    <string name="upiId">9928684010@upi</string>
 </resources>
