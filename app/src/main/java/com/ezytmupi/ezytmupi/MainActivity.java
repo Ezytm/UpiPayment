@@ -165,30 +165,6 @@ public class MainActivity extends AppCompatActivity implements PaymentUpiStatusL
         }
 
 
-//        Walletcall.Builder builder1 = new Walletcall.Builder(MainActivity.this)
-//                .setuserid("3001")
-//                .setToken("Sa")
-//                .setVendorUpiID("101")
-//                .setOurRefID("57568778")
-//                .setRetailerUpiID("9928684010@upi")
-//                .setUpiResponse("")
-//                .setUpiTxnStatus("1")
-//                .setAmount("10");
-//        try {
-//            walletcall = builder1.build();
-//
-//            // Register Listener for Events
-//            walletcall.setPaymentStatusListener(this);
-//
-//            // Start payment / transaction
-//            walletcall.startPayment();
-//        } catch (Exception exception) {
-//            exception.printStackTrace();
-//            toast("Error:    " + exception.getMessage());
-//        }
-
-
-
     }
 
     @Override
