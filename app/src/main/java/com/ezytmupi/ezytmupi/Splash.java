@@ -54,15 +54,7 @@ public class Splash extends AppCompatActivity {
     Snackbar snackbar, snackbar1;
     LinearLayout rlmain;
     ImageView logo;
-    Animation swing;
-  //  TextView ezytext, versionname;
-  //  ProgressBar progressBar;
-    String imino = "";
-    String msg = "";
-    String emaile = "";
-    Pattern pattern;
-    Account[] account;
-    String imno = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,22 +73,8 @@ public class Splash extends AppCompatActivity {
     }
 
     private void functionStart() {
-        //progressBar.setVisibility(View.VISIBLE);
-       /* try {
-            String vname=getPackageManager().getPackageInfo(getPackageName(),0).versionName;
-            versionname.setText("v"+vname);
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }*/
 
         Handler handler=new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                //ezytext.setVisibility(View.VISIBLE);
-            }
-        },1500);
-
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {

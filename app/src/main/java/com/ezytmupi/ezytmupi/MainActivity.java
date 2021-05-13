@@ -15,6 +15,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
+import android.text.format.Formatter;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
@@ -36,7 +37,13 @@ import com.ezytmupi.ezytmupipayment.models.WalletResponse;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
 import java.util.Random;
 
 
@@ -49,19 +56,14 @@ public class MainActivity extends AppCompatActivity implements PaymentUpiStatusL
 
     private Button payButton;
 
-    private RadioGroup radioAppChoice;
-
     private EditText eduserid;
     private EditText edtoken;
     private EditText edclientrefid;
     private EditText edupiid;
     private EditText edamount;
 
-
-    private EditText fieldDescription;
-    private EditText fieldAmount;
-
     String imei = "";
+    String ipaddress = "";
 
 
     private EzytmUpiPayment easyUpiPayment;
@@ -100,9 +102,6 @@ public class MainActivity extends AppCompatActivity implements PaymentUpiStatusL
 
         String transactionId = "TID" + System.currentTimeMillis();
 
-        Log.e("",""+transactionId);
-        radioAppChoice = findViewById(R.id.radioAppChoice);
-
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             imei = Settings.Secure.getString(
@@ -132,6 +131,56 @@ public class MainActivity extends AppCompatActivity implements PaymentUpiStatusL
         }
 
 
+        ipaddress = getIPAddress(true);
+
+
+
+    }
+
+//    public String getLocalIpAddress() {
+//        try {
+//            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
+//                NetworkInterface intf = en.nextElement();
+//                for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
+//                    InetAddress inetAddress = enumIpAddr.nextElement();
+//                    if (!inetAddress.isLoopbackAddress()) {
+//                        String ip = Formatter.formatIpAddress(inetAddress.hashCode());
+//
+//                        return ip;
+//                    }
+//                }
+//            }
+//        } catch (SocketException ex) {
+//          //  Log.e(TAG, ex.toString());
+//        }
+//        return null;
+//    }
+
+    public static String getIPAddress(boolean useIPv4) {
+        try {
+            List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
+            for (NetworkInterface intf : interfaces) {
+                List<InetAddress> addrs = Collections.list(intf.getInetAddresses());
+                for (InetAddress addr : addrs) {
+                    if (!addr.isLoopbackAddress()) {
+                        String sAddr = addr.getHostAddress();
+                        //boolean isIPv4 = InetAddressUtils.isIPv4Address(sAddr);
+                        boolean isIPv4 = sAddr.indexOf(':')<0;
+
+                        if (useIPv4) {
+                            if (isIPv4)
+                                return sAddr;
+                        } else {
+                            if (!isIPv4) {
+                                int delim = sAddr.indexOf('%'); // drop ip6 zone suffix
+                                return delim<0 ? sAddr.toUpperCase() : sAddr.substring(0, delim).toUpperCase();
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception ignored) { } // for now eat exceptions
+        return "";
     }
 
 
@@ -149,7 +198,7 @@ public class MainActivity extends AppCompatActivity implements PaymentUpiStatusL
                 .setRetailerUpiID(edupiid.getText().toString().trim())
                 .setRetailerUserID("7976155877")
                 .setPhoneInfo(imei)
-                .setIPadd("108:23:2:01")
+                .setIPadd(ipaddress)
                 .setAmount(edamount.getText().toString().trim() + ".00");
         //     END INITIALIZATION
 

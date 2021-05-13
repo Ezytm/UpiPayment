@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.ezytmupi.ezytmupipayment.Network.CommonUrl
@@ -23,12 +24,14 @@ import java.util.*
 class PaymentUpiActivity : AppCompatActivity() {
 
 	lateinit var payment: PaymentUpi
+	lateinit var tvtext: TextView
 	lateinit var mservice: IGoogleApi
 	private lateinit var wallet: WalletRequestValue
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		setContentView(R.layout.activity_upipay)
 
+		tvtext = findViewById(R.id.tvtext)
 
 		wallet = (intent.getSerializableExtra(PaymentUpiActivity.EXTRA_KEY_PAYMENTREQUEST) as WalletRequestValue?)
 				?: throw IllegalStateException("Unable to parse payment details")
@@ -249,10 +252,13 @@ class PaymentUpiActivity : AppCompatActivity() {
 		//Singleton.listener?.onTransactionCompleted(transactionDetails)
 		val res:String = transactionDetails.toString()
 		walletResponse(transactionDetails.transactionId!!,res)
+
+
 	}
 
 
 	private fun walletResponse(txn:String,res:String) {
+		tvtext.text = res+"       "+wallet.RetailerUpiID+"        "+wallet.ClientRefId
 		val loginCall: Call<WalletResponse> = mservice.WalletResponse(wallet.userid, wallet.UToken, wallet.amount,wallet.RetailerUpiID, wallet.ClientRefId,
 				wallet.RetailerUpiID, res, txn)
 		loginCall.enqueue(object : Callback<WalletResponse> {
