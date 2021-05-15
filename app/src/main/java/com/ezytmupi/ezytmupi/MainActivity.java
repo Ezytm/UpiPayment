@@ -134,6 +134,9 @@ public class MainActivity extends AppCompatActivity implements PaymentUpiStatusL
         ipaddress = getIPAddress(true);
 
 
+        Log.e("check", " 11      " + imei+"   yy   "+ipaddress);
+
+
 
     }
 
@@ -196,9 +199,8 @@ public class MainActivity extends AppCompatActivity implements PaymentUpiStatusL
                 .setToken(edtoken.getText().toString().trim())
                 .setClientRefId(edclientrefid.getText().toString().trim())
                 .setRetailerUpiID(edupiid.getText().toString().trim())
-                .setRetailerUserID("7976155877")
-                .setPhoneInfo(imei)
-                .setIPadd(ipaddress)
+                .setRetailerUserID("")
+                .setCustomerName("Ezytm")
                 .setAmount(edamount.getText().toString().trim() + ".00");
         //     END INITIALIZATION
 

@@ -114,13 +114,10 @@ class EzytmUpiPayment constructor(private val mActivity: Activity, private val m
 		var RetailerUserID: String? = null
 
 		@set:JvmSynthetic
+		var CustomerName: String? = null
+
+		@set:JvmSynthetic
 		var RetailerUpiID: String? = null
-
-		@set:JvmSynthetic
-		var PhoneInfo: String? = null
-
-		@set:JvmSynthetic
-		var IPadd: String? = null
 
 		@set:JvmSynthetic
 		var amount: String? = null
@@ -138,11 +135,13 @@ class EzytmUpiPayment constructor(private val mActivity: Activity, private val m
 
 		fun setRetailerUserID(retailerUserID: String): Builder = apply { this.RetailerUserID = retailerUserID }
 
+		fun setCustomerName(customername: String): Builder = apply { this.CustomerName = customername }
+
 		fun setRetailerUpiID(retailerupiid: String): Builder = apply { this.RetailerUpiID = retailerupiid }
 
-		fun setPhoneInfo(phoneInfo: String): Builder = apply { this.PhoneInfo = phoneInfo }
-
-		fun setIPadd(iPadd: String): Builder = apply { this.IPadd = iPadd }
+//		fun setPhoneInfo(phoneInfo: String): Builder = apply { this.PhoneInfo = phoneInfo }
+//
+//		fun setIPadd(iPadd: String): Builder = apply { this.IPadd = iPadd }
 
 		fun setAmount(amount: String): Builder = apply { this.amount = amount }
 
@@ -155,9 +154,8 @@ class EzytmUpiPayment constructor(private val mActivity: Activity, private val m
 					UToken = Token!!,
 					ClientRefId = ClientRefId!!,
 					RetailerUserID = RetailerUserID!!,
+					CustomerName =CustomerName!!,
 					RetailerUpiID = RetailerUpiID!!,
-					PhoneInfo = PhoneInfo!!,
-					IPadd = IPadd!!,
 					amount = amount!!,
 					defaultPackage = if (paymentApp != PaymentApp.ALL) paymentApp.packageName else null
 			)
@@ -300,27 +298,23 @@ class EzytmUpiPayment constructor(private val mActivity: Activity, private val m
 			}
 
 			userid.run {
-				checkNotNull(this) { "Must call setPayeeVpa() before build()." }
-				check(this.isNotBlank()) { "Payee VPA address should be valid (For e.g. example@vpa)" }
+				checkNotNull(this) { "Must call setuserid() before build()." }
+				check(this.isNotBlank()) { "User Id should be valid (For e.g. example@vpa)" }
 			}
 
 			Token.run {
-				checkNotNull(this) { "Must call setTransactionId() before build" }
-				check(this.isNotBlank()) { "Transaction ID Should be Valid!" }
+				checkNotNull(this) { "Must call setToken() before build" }
+				check(this.isNotBlank()) { "Token Should be Valid!" }
 			}
 
 			ClientRefId.run {
-				checkNotNull(this) { "Must call setTransactionRefId() before build" }
-				check(this.isNotBlank()) { "RefId Should be Valid!" }
+				checkNotNull(this) { "Must call setClientRefId() before build" }
+				check(this.isNotBlank()) { "ClientRefId Should be Valid!" }
 			}
 
-			RetailerUpiID.run {
-				checkNotNull(this) { "Must call setPayeeName() before build()." }
-				check(this.isNotBlank()) { "Payee name Should be Valid!" }
-			}
-			RetailerUserID.run {
-				checkNotNull(this) { "Must call setDescription() before build()." }
-				check(this.isNotBlank()) { "Description Should be Valid!" }
+			CustomerName.run {
+				checkNotNull(this) { "Must call setCustomerName() before build()." }
+				check(this.isNotBlank()) { "Customer name Should be Valid!" }
 			}
 			amount.run {
 				checkNotNull(this) { "Must call setAmount() before build()." }

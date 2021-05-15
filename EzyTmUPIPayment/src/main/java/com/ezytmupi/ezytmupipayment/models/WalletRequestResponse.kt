@@ -7,5 +7,6 @@ data class WalletRequestResponse(
         val VendorUpiID: String?,
         val OurRefID: String?,
         val PaymentMode: String?,
+        val Name:String?,
         val PaymentQRCode: String?
 )

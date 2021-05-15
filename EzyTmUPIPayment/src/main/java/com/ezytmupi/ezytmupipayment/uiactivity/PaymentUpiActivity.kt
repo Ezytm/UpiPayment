@@ -1,30 +1,37 @@
 package com.ezytmupi.ezytmupipayment.uiactivity
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
+import android.telephony.TelephonyManager
 import android.util.Log
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import com.ezytmupi.ezytmupipayment.Network.CommonUrl
 import com.ezytmupi.ezytmupipayment.Network.IGoogleApi
 import com.ezytmupi.ezytmupipayment.R
 import com.ezytmupi.ezytmupipayment.Singleton
-import com.ezytmupi.ezytmupipayment.exception.AppNotFoundException
 import com.ezytmupi.ezytmupipayment.models.*
 import com.google.gson.Gson
 import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-
+import java.net.InetAddress
+import java.net.NetworkInterface
 import java.util.*
 
 class PaymentUpiActivity : AppCompatActivity() {
 
 	lateinit var payment: PaymentUpi
 	lateinit var tvtext: TextView
+	var imei = ""
+	var ipaddress = ""
 	lateinit var mservice: IGoogleApi
 	private lateinit var wallet: WalletRequestValue
 	override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,59 +43,122 @@ class PaymentUpiActivity : AppCompatActivity() {
 		wallet = (intent.getSerializableExtra(PaymentUpiActivity.EXTRA_KEY_PAYMENTREQUEST) as WalletRequestValue?)
 				?: throw IllegalStateException("Unable to parse payment details")
 
-//		payment = (intent.getSerializableExtra(EXTRA_KEY_PAYMENT) as PaymentUpi?)
-//				?: throw IllegalStateException("Unable to parse payment details")
-
-//		// Set Parameters for UPI
-//		val paymentUri = Uri.Builder().apply {
-//			with(payment) {
-//				scheme("upi").authority("pay")
-//				appendQueryParameter("pa", vpa)
-//				appendQueryParameter("pn", name)
-//				appendQueryParameter("tid", txnId)
-//				payeeMerchantCode?.let { appendQueryParameter("mc", it) }
-//				appendQueryParameter("tr", txnRefId)
-//				appendQueryParameter("tn", description)
-//				appendQueryParameter("am", amount)
-//				appendQueryParameter("cu", currency)
-//			}
-//		}.build()
-//
-//		// Set Data Intent
-//		val paymentIntent = Intent(Intent.ACTION_VIEW).apply {
-//			data = paymentUri
-//
-//			// Check for Default package
-//			payment.defaultPackage?.let {
-//				`package` = it
-//			}
-//		}
-//
-//		// Show Dialog to user
-//		val appChooser = Intent.createChooser(paymentIntent, "Pay using")
-//
-//		// Check if other UPI apps are exists or not.
-//		if (paymentIntent.resolveActivity(packageManager) != null) {
-//			startActivityForResult(appChooser, PAYMENT_REQUEST)
-//		} else {
-//			//Toast.makeText(this, "No UPI app found! Please Install to Proceed!", Toast.LENGTH_SHORT).show()
-//			throwOnAppNotFound()
-//			finish()
-//		}
-
 		WalletRequest()
+		getimei()
+		ipaddress = getIPAddress(true)
+		Log.e("check", "       " + imei+"   yy   "+ipaddress)
+
+
+	}
+
+
+	//    public String getLocalIpAddress() {
+	//        try {
+	//            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
+	//                NetworkInterface intf = en.nextElement();
+	//                for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
+	//                    InetAddress inetAddress = enumIpAddr.nextElement();
+	//                    if (!inetAddress.isLoopbackAddress()) {
+	//                        String ip = Formatter.formatIpAddress(inetAddress.hashCode());
+	//
+	//                        return ip;
+	//                    }
+	//                }
+	//            }
+	//        } catch (SocketException ex) {
+	//          //  Log.e(TAG, ex.toString());
+	//        }
+	//        return null;
+	//    }
+	fun getimei() {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+			imei = Settings.Secure.getString(
+					applicationContext.contentResolver,
+					Settings.Secure.ANDROID_ID)
+		} else {
+			val mTelephony = applicationContext.getSystemService(TELEPHONY_SERVICE) as TelephonyManager
+			if (ActivityCompat.checkSelfPermission(this@PaymentUpiActivity, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+				// TODO: Consider calling
+				//    Activity#requestPermissions
+				// here to request the missing permissions, and then overriding
+				//   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+				//                                          int[] grantResults)
+				// to handle the case where the user grants the permission. See the documentation
+				// for Activity#requestPermissions for more details.
+				return
+			}
+			if (mTelephony.deviceId != null) {
+				imei = mTelephony.deviceId
+			} else {
+				imei = Settings.Secure.getString(
+						applicationContext.contentResolver,
+						Settings.Secure.ANDROID_ID)
+			}
+		}
+	}
+
+
+	//    public String getLocalIpAddress() {
+	//        try {
+	//            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
+	//                NetworkInterface intf = en.nextElement();
+	//                for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
+	//                    InetAddress inetAddress = enumIpAddr.nextElement();
+	//                    if (!inetAddress.isLoopbackAddress()) {
+	//                        String ip = Formatter.formatIpAddress(inetAddress.hashCode());
+	//
+	//                        return ip;
+	//                    }
+	//                }
+	//            }
+	//        } catch (SocketException ex) {
+	//          //  Log.e(TAG, ex.toString());
+	//        }
+	//        return null;
+	//    }
+	fun getIPAddress(useIPv4: Boolean): String {
+		try {
+			val interfaces: List<NetworkInterface> = Collections.list(NetworkInterface.getNetworkInterfaces())
+			for (intf in interfaces) {
+				val addrs: List<InetAddress> = Collections.list(intf.inetAddresses)
+				for (addr in addrs) {
+					if (!addr.isLoopbackAddress) {
+						val sAddr = addr.hostAddress
+						//boolean isIPv4 = InetAddressUtils.isIPv4Address(sAddr);
+						val isIPv4 = sAddr.indexOf(':') < 0
+						if (useIPv4) {
+							if (isIPv4) return sAddr
+						} else {
+							if (!isIPv4) {
+								val delim = sAddr.indexOf('%') // drop ip6 zone suffix
+								return if (delim < 0) sAddr.toUpperCase() else sAddr.substring(0, delim).toUpperCase()
+							}
+						}
+					}
+				}
+			}
+		} catch (ignored: Exception) {
+		} // for now eat exceptions
+		return ""
 	}
 
 	private fun WalletRequest() {
-		mservice = CommonUrl.getGoogleApi()
-		Log.e("check", "  Kishan11       " + wallet.userid +"  "+wallet.UToken+"    "+wallet.PhoneInfo+"   "+wallet.IPadd)
-		val loginCall: Call<WalletRequestResponse> = mservice.WalletRequest(wallet.userid, wallet.UToken,wallet.amount, wallet.ClientRefId,
-				wallet.RetailerUserID, wallet.RetailerUpiID, wallet.PhoneInfo,wallet.IPadd)
-		loginCall.enqueue(object : Callback<WalletRequestResponse> {
-			override fun onResponse(call: Call<WalletRequestResponse>, response: Response<WalletRequestResponse>) {
-				if (response != null) {
-					val jsonobject: JSONObject = JSONObject(Gson().toJson(response.body()))
 
+		if(imei.equals("")||imei==null){
+			imei = ""
+		}
+		mservice = CommonUrl.getGoogleApi()
+		Log.e("check", "  Kishan11       " + wallet.userid + "  " + wallet.UToken)
+		val loginCall: Call<WalletRequestResponse> = mservice.WalletRequest(wallet.userid, wallet.UToken, wallet.amount, wallet.ClientRefId,
+				wallet.RetailerUserID, wallet.RetailerUpiID, imei, ipaddress)
+
+		loginCall.enqueue(object : Callback<WalletRequestResponse> {
+
+			override fun onResponse(call: Call<WalletRequestResponse>, response: Response<WalletRequestResponse>) {
+
+				if (response != null) {
+
+					val jsonobject: JSONObject = JSONObject(Gson().toJson(response.body()))
 
 					if (jsonobject.getString("ERROR").equals("0")) {
 
@@ -105,28 +175,36 @@ class PaymentUpiActivity : AppCompatActivity() {
 								defaultPackage = wallet.defaultPackage
 						)
 
-						upicall(response.body()!!.VendorUpiID!!,response.body()!!.OurRefID!!,wallet.amount!!,response.body()!!.PaymentMode!!)
+						upicall(response.body()!!.VendorUpiID!!, response.body()!!.OurRefID!!, wallet.amount!!, response.body()!!.PaymentMode!!, response.body()!!.Name.toString())
 						//	callbackTransactionCompleted(transactionDetails!!)
-					} else if (jsonobject.getString("ERROR").equals("5")) {
+					}
+
+					else if (jsonobject.getString("ERROR").equals("5")) {
 						val transactionDetails = response.body()
 						//	callbackTransactionCompleted(transactionDetails!!)
 						//finish()
-					} else {
+					}
+
+					else {
 
 					}
+
 				}
 				else {
 					Log.e("check", "  server error       " + response)
 				}
+
 			}
 
 			override fun onFailure(call: Call<WalletRequestResponse>, t: Throwable) {
 				Log.e("check", "  error       " + t.message)
 			}
+
 		})
+
 	}
 
-	private fun upicall(upiid:String,txnid:String,amt:String,name:String){
+	private fun upicall(upiid: String, txnid: String, amt: String, paymentmode: String,name:String){
 
 //		payment = (this@PaymentUpiActivity.intent.getSerializableExtra(PaymentUpiActivity.EXTRA_KEY_PAYMENT) as PaymentUpi?)
 //		?: throw IllegalStateException("Unable to parse payment details")
@@ -251,15 +329,15 @@ class PaymentUpiActivity : AppCompatActivity() {
 	internal fun callbackTransactionCompleted(transactionDetails: TransactionDetails) {
 		//Singleton.listener?.onTransactionCompleted(transactionDetails)
 		val res:String = transactionDetails.toString()
-		walletResponse(transactionDetails.transactionId!!,res)
+		walletResponse(transactionDetails.transactionId!!, res)
 
 
 	}
 
 
-	private fun walletResponse(txn:String,res:String) {
+	private fun walletResponse(txn: String, res: String) {
 		tvtext.text = res+"       "+wallet.RetailerUpiID+"        "+wallet.ClientRefId
-		val loginCall: Call<WalletResponse> = mservice.WalletResponse(wallet.userid, wallet.UToken, wallet.amount,wallet.RetailerUpiID, wallet.ClientRefId,
+		val loginCall: Call<WalletResponse> = mservice.WalletResponse(wallet.userid, wallet.UToken, wallet.amount, wallet.RetailerUpiID, wallet.ClientRefId,
 				wallet.RetailerUpiID, res, txn)
 		loginCall.enqueue(object : Callback<WalletResponse> {
 			override fun onResponse(call: Call<WalletResponse>, response: Response<WalletResponse>) {
@@ -277,8 +355,7 @@ class PaymentUpiActivity : AppCompatActivity() {
 					} else {
 
 					}
-				}
-				else {
+				} else {
 					Log.e("check", "  server error       " + response)
 				}
 			}
