@@ -78,8 +78,7 @@ class PaymentUpiActivity : AppCompatActivity() {
 		} else {
 			val mTelephony = applicationContext.getSystemService(TELEPHONY_SERVICE) as TelephonyManager
 			if (ActivityCompat.checkSelfPermission(this@PaymentUpiActivity, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-				// TODO: Consider calling
-				//    Activity#requestPermissions
+
 				// here to request the missing permissions, and then overriding
 				//   public void onRequestPermissionsResult(int requestCode, String[] permissions,
 				//                                          int[] grantResults)
@@ -147,10 +146,13 @@ class PaymentUpiActivity : AppCompatActivity() {
 		if(imei.equals("")||imei==null){
 			imei = ""
 		}
+		if(ipaddress.equals("")||ipaddress==null||ipaddress.isEmpty()){
+			ipaddress = ""
+		}
 		mservice = CommonUrl.getGoogleApi()
 		Log.e("check", "  Kishan11       " + wallet.userid + "  " + wallet.UToken)
 		val loginCall: Call<WalletRequestResponse> = mservice.WalletRequest(wallet.userid, wallet.UToken, wallet.amount, wallet.ClientRefId,
-				wallet.RetailerUserID, wallet.RetailerUpiID, imei, ipaddress)
+				wallet.RetailerUserID,wallet.CustomerName, wallet.RetailerUpiID, imei, ipaddress)
 
 		loginCall.enqueue(object : Callback<WalletRequestResponse> {
 
@@ -159,6 +161,8 @@ class PaymentUpiActivity : AppCompatActivity() {
 				if (response != null) {
 
 					val jsonobject: JSONObject = JSONObject(Gson().toJson(response.body()))
+
+					Log.e("jsonobject","              "+jsonobject)
 
 					if (jsonobject.getString("ERROR").equals("0")) {
 

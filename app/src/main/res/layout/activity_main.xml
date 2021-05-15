@@ -44,6 +44,15 @@
         android:textColor="@android:color/black"></EditText>
 
     <EditText
+        android:id="@+id/edusername"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:hint="@string/clientid"
+        android:inputType="text"
+        android:textColor="@android:color/black"></EditText>
+
+    <EditText
         android:id="@+id/edupiid"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -32,6 +32,7 @@ public interface IGoogleApi {
                                               @Field("Amount") String Amount,
                                               @Field("ClientRefId") String ClientRefId,
                                               @Field("RetailerUserID") String RetailerUserID,
+                                              @Field("CustomerName") String CustomerName,
                                               @Field("RetailerUpiID") String RetailerUpiID,
                                               @Field("PhoneInfo") String PhoneInfo,
                                               @Field("IPadd") String IPadd);

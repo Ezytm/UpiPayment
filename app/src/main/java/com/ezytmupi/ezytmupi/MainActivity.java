@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity implements PaymentUpiStatusL
     private EditText edclientrefid;
     private EditText edupiid;
     private EditText edamount;
+    private EditText edusername;
 
     String imei = "";
     String ipaddress = "";
@@ -88,13 +89,14 @@ public class MainActivity extends AppCompatActivity implements PaymentUpiStatusL
         edclientrefid = findViewById(R.id.edclientrefid);
         edtoken = findViewById(R.id.edtoken);
         edamount = findViewById(R.id.edamount);
+        edusername = findViewById(R.id.edusername);
 
         eduserid.setText(getResources().getString(R.string.userid));
         edtoken.setText(getResources().getString(R.string.tokenid));
         edclientrefid.setText(getResources().getString(R.string.clientrefid));
         edupiid.setText(getResources().getString(R.string.upiId));
         edamount.setText("1");
-
+        edusername.setText("EzyTm");
 
         imageView = findViewById(R.id.imageView);
         statusView = findViewById(R.id.textView_status);
@@ -200,7 +202,7 @@ public class MainActivity extends AppCompatActivity implements PaymentUpiStatusL
                 .setClientRefId(edclientrefid.getText().toString().trim())
                 .setRetailerUpiID(edupiid.getText().toString().trim())
                 .setRetailerUserID("")
-                .setCustomerName("Ezytm")
+                .setCustomerName(edusername.getText().toString().trim())
                 .setAmount(edamount.getText().toString().trim() + ".00");
         //     END INITIALIZATION
 
