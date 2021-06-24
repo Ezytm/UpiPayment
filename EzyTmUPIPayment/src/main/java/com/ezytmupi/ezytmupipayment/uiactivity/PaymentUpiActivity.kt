@@ -43,33 +43,20 @@ class PaymentUpiActivity : AppCompatActivity() {
 		wallet = (intent.getSerializableExtra(PaymentUpiActivity.EXTRA_KEY_PAYMENTREQUEST) as WalletRequestValue?)
 				?: throw IllegalStateException("Unable to parse payment details")
 
-		WalletRequest()
+
 		getimei()
 		ipaddress = getIPAddress(true)
 		Log.e("check", "       " + imei+"   yy   "+ipaddress)
-
-
+		if(imei.equals("")|| imei ==null|| imei.isEmpty()){
+			imei = ""
+		}
+		if(ipaddress.equals("")|| ipaddress ==null|| ipaddress.isEmpty()){
+			ipaddress= ""
+		}
+		WalletRequest(imei,ipaddress)
 	}
 
 
-	//    public String getLocalIpAddress() {
-	//        try {
-	//            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
-	//                NetworkInterface intf = en.nextElement();
-	//                for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
-	//                    InetAddress inetAddress = enumIpAddr.nextElement();
-	//                    if (!inetAddress.isLoopbackAddress()) {
-	//                        String ip = Formatter.formatIpAddress(inetAddress.hashCode());
-	//
-	//                        return ip;
-	//                    }
-	//                }
-	//            }
-	//        } catch (SocketException ex) {
-	//          //  Log.e(TAG, ex.toString());
-	//        }
-	//        return null;
-	//    }
 	fun getimei() {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
 			imei = Settings.Secure.getString(
@@ -96,25 +83,6 @@ class PaymentUpiActivity : AppCompatActivity() {
 		}
 	}
 
-
-	//    public String getLocalIpAddress() {
-	//        try {
-	//            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
-	//                NetworkInterface intf = en.nextElement();
-	//                for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
-	//                    InetAddress inetAddress = enumIpAddr.nextElement();
-	//                    if (!inetAddress.isLoopbackAddress()) {
-	//                        String ip = Formatter.formatIpAddress(inetAddress.hashCode());
-	//
-	//                        return ip;
-	//                    }
-	//                }
-	//            }
-	//        } catch (SocketException ex) {
-	//          //  Log.e(TAG, ex.toString());
-	//        }
-	//        return null;
-	//    }
 	fun getIPAddress(useIPv4: Boolean): String {
 		try {
 			val interfaces: List<NetworkInterface> = Collections.list(NetworkInterface.getNetworkInterfaces())
@@ -141,18 +109,14 @@ class PaymentUpiActivity : AppCompatActivity() {
 		return ""
 	}
 
-	private fun WalletRequest() {
+	private fun WalletRequest(imei1: String, ipaddress1: String) {
 
-		if(imei.equals("")||imei==null){
-			imei = ""
-		}
-		if(ipaddress.equals("")||ipaddress==null||ipaddress.isEmpty()){
-			ipaddress = ""
-		}
+		Log.e("check", "        " + imei1 + "       ccc           " + ipaddress1)
+
 		mservice = CommonUrl.getGoogleApi()
-		Log.e("check", "  Kishan11       " + wallet.userid + "  " + wallet.UToken)
+
 		val loginCall: Call<WalletRequestResponse> = mservice.WalletRequest(wallet.userid, wallet.UToken, wallet.amount, wallet.ClientRefId,
-				wallet.RetailerUserID,wallet.CustomerName, wallet.RetailerUpiID, imei, ipaddress)
+				wallet.RetailerUserID,wallet.CustomerName, wallet.RetailerUpiID, imei1, ipaddress1)
 
 		loginCall.enqueue(object : Callback<WalletRequestResponse> {
 
@@ -338,7 +302,6 @@ class PaymentUpiActivity : AppCompatActivity() {
 
 	}
 
-
 	private fun walletResponse(txn: String, res: String) {
 		tvtext.text = res+"       "+wallet.RetailerUpiID+"        "+wallet.ClientRefId
 		val loginCall: Call<WalletResponse> = mservice.WalletResponse(wallet.userid, wallet.UToken, wallet.amount, wallet.RetailerUpiID, wallet.ClientRefId,
@@ -375,11 +338,11 @@ class PaymentUpiActivity : AppCompatActivity() {
 		Singleton.listener?.onwalletCompleted(transactionDetails)
 	}
 
-
 	companion object {
 		const val TAG = "PaymentUiActivity"
 		const val PAYMENT_REQUEST = 4400
 		const val EXTRA_KEY_PAYMENTREQUEST = "payment"
 		const val EXTRA_KEY_PAYMENT = "payment"
 	}
+
 }

@@ -46,8 +46,6 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Random;
 
-
-
 public class MainActivity extends AppCompatActivity implements PaymentUpiStatusListener {
 
     private ImageView imageView;
@@ -136,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements PaymentUpiStatusL
         ipaddress = getIPAddress(true);
 
 
-        Log.e("check", " 11      " + imei+"   yy   "+ipaddress);
+    //    Log.e("check", " 11      " + imei+"   yy   "+ipaddress);
 
 
 
