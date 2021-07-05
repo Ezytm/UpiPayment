@@ -32,6 +32,7 @@ class PaymentUpiActivity : AppCompatActivity() {
 	lateinit var tvtext: TextView
 	var imei = ""
 	var ipaddress = ""
+	var venderupiId = ""
 	lateinit var mservice: IGoogleApi
 	private lateinit var wallet: WalletRequestValue
 	override fun onCreate(savedInstanceState: Bundle?) {
@@ -131,6 +132,12 @@ class PaymentUpiActivity : AppCompatActivity() {
 					if (jsonobject.getString("ERROR").equals("0")) {
 
 						val transactionDetails = response.body()
+						if(response.body()!!.VendorUpiID==null|| response.body()!!.VendorUpiID!!.isEmpty()||response.body()!!.VendorUpiID.equals("")){
+
+						}else{
+							venderupiId =  response.body()!!.VendorUpiID!!
+						}
+
 						payment = PaymentUpi(
 								currency = "INR",
 								vpa = response.body()!!.VendorUpiID!!,
@@ -255,10 +262,9 @@ class PaymentUpiActivity : AppCompatActivity() {
 					approvalRefNo = get("ApprovalRefNo"),
 					transactionRefId = get("txnRef"),
 					amount = payment.amount,
-					transactionStatus = TransactionStatus.valueOf(
-							get("Status")?.toUpperCase(Locale.getDefault())
+					transactionStatus = get("Status")?.toUpperCase(Locale.getDefault())
 									?: TransactionStatus.FAILURE.name
-					)
+
 			)
 		}
 	}
@@ -297,15 +303,15 @@ class PaymentUpiActivity : AppCompatActivity() {
 	internal fun callbackTransactionCompleted(transactionDetails: TransactionDetails) {
 		//Singleton.listener?.onTransactionCompleted(transactionDetails)
 		val res:String = transactionDetails.toString()
-		walletResponse(transactionDetails.transactionId!!, res)
+		walletResponse(transactionDetails.transactionId!!, res,transactionDetails.transactionStatus!!)
 
 
 	}
 
-	private fun walletResponse(txn: String, res: String) {
+	private fun walletResponse(txn: String, res: String, status: String) {
 		tvtext.text = res+"       "+wallet.RetailerUpiID+"        "+wallet.ClientRefId
-		val loginCall: Call<WalletResponse> = mservice.WalletResponse(wallet.userid, wallet.UToken, wallet.amount, wallet.RetailerUpiID, wallet.ClientRefId,
-				wallet.RetailerUpiID, res, txn)
+		val loginCall: Call<WalletResponse> = mservice.WalletResponse(wallet.userid, wallet.UToken, wallet.amount, venderupiId, txn,
+				wallet.RetailerUpiID, res, status)
 		loginCall.enqueue(object : Callback<WalletResponse> {
 			override fun onResponse(call: Call<WalletResponse>, response: Response<WalletResponse>) {
 				if (response != null) {

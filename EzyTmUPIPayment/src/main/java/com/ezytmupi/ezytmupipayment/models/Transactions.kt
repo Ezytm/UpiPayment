@@ -4,7 +4,7 @@ data class TransactionDetails(
 		val transactionId: String?,
 		val responseCode: String?,
 		val approvalRefNo: String?,
-		val transactionStatus: TransactionStatus,
+		val transactionStatus: String?,
 		val transactionRefId: String?,
 		val amount: String?
 )
