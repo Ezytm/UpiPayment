@@ -20,14 +20,8 @@ public interface IGoogleApi {
                                         @Field("OurRefID") String OurRefID,
                                         @Field("RetailerUpiID") String RetailerUpiID,
                                         @Field("UpiResponse") String UpiResponse,
-                                        @Field("UpiTxnStatus") String UpiTxnStatus);
-
-
-    //Vendor me retailer upi id ja rhi hai use vendor ki hi bhejni hai
-    //OurRefId me Txn id bhejni hai jo WalletRequest se milti hai
-    //UpiTxnStatus me txn id ja rhi hai us me status bhejna hai
-
-
+                                        @Field("UpiTxnStatusMsg") String UpiTxnStatusMsg,
+                                        @Field("BankRefID") String BankRefID);
 
 
     @FormUrlEncoded

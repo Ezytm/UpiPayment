@@ -291,6 +291,7 @@ class PaymentUpiActivity : AppCompatActivity() {
 
 	@JvmSynthetic
 	internal fun callbackTransactionCancelled() {
+		walletResponse("0", "0", "Cancelled by user", "0")
 		Singleton.listener?.onTransactionCancelled()
 	}
 
@@ -303,15 +304,21 @@ class PaymentUpiActivity : AppCompatActivity() {
 	internal fun callbackTransactionCompleted(transactionDetails: TransactionDetails) {
 		//Singleton.listener?.onTransactionCompleted(transactionDetails)
 		val res:String = transactionDetails.toString()
-		walletResponse(transactionDetails.transactionId!!, res,transactionDetails.transactionStatus!!)
+		var bankrefnumber:String = transactionDetails.approvalRefNo!!
+		if(bankrefnumber==null||bankrefnumber.equals("")){
+			bankrefnumber = ""
+		}else{
+			bankrefnumber = transactionDetails.approvalRefNo!!
+		}
 
-
+		walletResponse(transactionDetails.transactionId!!, res,transactionDetails.transactionStatus!!,bankrefnumber)
 	}
 
-	private fun walletResponse(txn: String, res: String, status: String) {
-		tvtext.text = res+"       "+wallet.RetailerUpiID+"        "+wallet.ClientRefId
+	private fun walletResponse(txn: String, res: String, status: String,bankrefnumber: String) {
+		tvtext.text = res+"     1     "+wallet.RetailerUpiID+"   2     "+venderupiId+"     3       "+bankrefnumber
 		val loginCall: Call<WalletResponse> = mservice.WalletResponse(wallet.userid, wallet.UToken, wallet.amount, venderupiId, txn,
-				wallet.RetailerUpiID, res, status)
+				wallet.RetailerUpiID,res,status,bankrefnumber)
+
 		loginCall.enqueue(object : Callback<WalletResponse> {
 			override fun onResponse(call: Call<WalletResponse>, response: Response<WalletResponse>) {
 				if (response != null) {
@@ -326,7 +333,9 @@ class PaymentUpiActivity : AppCompatActivity() {
 						callbackTransactionCompleted(transactionDetails!!)
 						finish()
 					} else {
-
+						val transactionDetails = response.body()
+						callbackTransactionCompleted(transactionDetails!!)
+						finish()
 					}
 				} else {
 					Log.e("check", "  server error       " + response)

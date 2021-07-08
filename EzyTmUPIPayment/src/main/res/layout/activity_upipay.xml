@@ -14,8 +14,9 @@
 
 
     <TextView
-        android:visibility="gone"
-        android:layout_width="wrap_content"
+        android:visibility="visible"
+        android:layout_width="match_parent"
+        android:textSize="15dp"
         android:textColor="@android:color/black"
         android:id="@+id/tvtext"
         android:layout_height="wrap_content">

@@ -20,9 +20,9 @@
             android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
 
 
-        <activity
-            android:name=".uiactivity.WalletActivity"
-            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
+<!--        <activity-->
+<!--            android:name=".uiactivity.WalletActivity"-->
+<!--            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />-->
     </application>
 
 </manifest>
