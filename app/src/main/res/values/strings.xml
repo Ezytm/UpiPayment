@@ -12,7 +12,7 @@
     <string name="PaywithUPI">Pay with UPI</string>
 
     <string name="userid">9645</string>
-    <string name="tokenid">Aa</string>
-    <string name="clientrefid">1</string>
+    <string name="tokenid">Aa@12345</string>
+    <string name="clientrefid">2297</string>
     <string name="upiId">9928684010@upi</string>
 </resources>
