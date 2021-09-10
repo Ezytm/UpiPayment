@@ -316,7 +316,7 @@ class PaymentUpiActivity : AppCompatActivity() {
 
 	private fun walletResponse(txn: String, res: String, status: String,bankrefnumber: String) {
 		tvtext.text = res+"     1     "+wallet.RetailerUpiID+"   2     "+venderupiId+"     3       "+bankrefnumber
-		val loginCall: Call<WalletResponse> = mservice.WalletResponse(wallet.userid, wallet.UToken, wallet.amount, venderupiId, txn,
+		val loginCall: Call<WalletResponse> = mservice.WalletResponse(wallet.userid, wallet.UToken, wallet.amount, venderupiId, wallet.ClientRefId,
 				wallet.RetailerUpiID,res,status,bankrefnumber)
 
 		loginCall.enqueue(object : Callback<WalletResponse> {

@@ -49,9 +49,7 @@ import java.util.Random;
 public class MainActivity extends AppCompatActivity implements PaymentUpiStatusListener {
 
     private ImageView imageView;
-
     private TextView statusView;
-
     private Button payButton;
 
     private EditText eduserid;
@@ -64,7 +62,6 @@ public class MainActivity extends AppCompatActivity implements PaymentUpiStatusL
     String imei = "";
     String ipaddress = "";
 
-
     private EzytmUpiPayment easyUpiPayment;
     //private Walletcall walletcall;
     private static final int MY_CAMERA_REQUEST_CODE = 100;
@@ -74,8 +71,8 @@ public class MainActivity extends AppCompatActivity implements PaymentUpiStatusL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initViews();
-
         payButton.setOnClickListener(v -> pay());
+
     }
 
 
@@ -198,9 +195,9 @@ public class MainActivity extends AppCompatActivity implements PaymentUpiStatusL
                 .setuserid(eduserid.getText().toString().trim())
                 .setToken(edtoken.getText().toString().trim())
                 .setClientRefId(edclientrefid.getText().toString().trim())
-                .setRetailerUpiID(edupiid.getText().toString().trim())
+                .setRetailerUpiID("")
                 .setRetailerUserID("")
-                .setCustomerName(edusername.getText().toString().trim())
+                .setCustomerName("Abhipe")
                 .setAmount(edamount.getText().toString().trim() + ".00");
         //     END INITIALIZATION
 
