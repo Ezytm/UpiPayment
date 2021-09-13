@@ -10,6 +10,7 @@ import android.provider.Settings
 import android.telephony.TelephonyManager
 import android.util.Log
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.ezytmupi.ezytmupipayment.Network.CommonUrl
@@ -39,23 +40,21 @@ class PaymentUpiActivity : AppCompatActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		setContentView(R.layout.activity_upipay)
-
 		tvtext = findViewById(R.id.tvtext)
 
 		wallet = (intent.getSerializableExtra(PaymentUpiActivity.EXTRA_KEY_PAYMENTREQUEST) as WalletRequestValue?)
 				?: throw IllegalStateException("Unable to parse payment details")
 
-
 		getimei()
 		ipaddress = getIPAddress(true)
-		Log.e("check", "       " + imei+"   yy   "+ipaddress)
+		Log.e("check", "       " + imei + "   yy   " + ipaddress)
 		if(imei.equals("")|| imei ==null|| imei.isEmpty()){
 			imei = ""
 		}
 		if(ipaddress.equals("")|| ipaddress ==null|| ipaddress.isEmpty()){
 			ipaddress= ""
 		}
-		WalletRequest(imei,ipaddress)
+		WalletRequest(imei, ipaddress)
 	}
 
 
@@ -113,12 +112,12 @@ class PaymentUpiActivity : AppCompatActivity() {
 
 	private fun WalletRequest(imei1: String, ipaddress1: String) {
 
-		Log.e("check", "        " + imei1 + "       ccc           " + ipaddress1)
+		//Log.e("check", "        " + imei1 + "       ccc           " + ipaddress1)
 
 		mservice = CommonUrl.getGoogleApi()
 
 		val loginCall: Call<WalletRequestResponse> = mservice.WalletRequest(wallet.userid, wallet.UToken, wallet.amount, wallet.ClientRefId,
-				wallet.RetailerUserID,wallet.CustomerName, wallet.RetailerUpiID, imei1, ipaddress1)
+				wallet.RetailerUserID, wallet.CustomerName, wallet.RetailerUpiID, imei1, ipaddress1)
 
 		loginCall.enqueue(object : Callback<WalletRequestResponse> {
 
@@ -128,16 +127,16 @@ class PaymentUpiActivity : AppCompatActivity() {
 
 					val jsonobject: JSONObject = JSONObject(Gson().toJson(response.body()))
 
-					Log.e("jsonobject","              "+jsonobject)
+					Log.e("jsonobject", "              " + jsonobject)
 
 					if (jsonobject.getString("ERROR").equals("0")) {
 
 						val transactionDetails = response.body()
-						if(response.body()!!.VendorUpiID==null|| response.body()!!.VendorUpiID!!.isEmpty()||response.body()!!.VendorUpiID.equals("")){
+						if (response.body()!!.VendorUpiID == null || response.body()!!.VendorUpiID!!.isEmpty() || response.body()!!.VendorUpiID.equals("")) {
 
-						}else{
-							venderupiId =  response.body()!!.VendorUpiID!!
-							ourrefid =  response.body()!!.OurRefID!!!!
+						} else {
+							venderupiId = response.body()!!.VendorUpiID!!
+							ourrefid = response.body()!!.OurRefID!!!!
 						}
 
 						payment = PaymentUpi(
@@ -154,20 +153,15 @@ class PaymentUpiActivity : AppCompatActivity() {
 
 						upicall(response.body()!!.VendorUpiID!!, response.body()!!.OurRefID!!, wallet.amount!!, response.body()!!.PaymentMode!!, response.body()!!.Name.toString())
 						//	callbackTransactionCompleted(transactionDetails!!)
-					}
-
-					else if (jsonobject.getString("ERROR").equals("5")) {
+					} else if (jsonobject.getString("ERROR").equals("5")) {
 						val transactionDetails = response.body()
 						//	callbackTransactionCompleted(transactionDetails!!)
 						//finish()
-					}
-
-					else {
+					} else {
 
 					}
 
-				}
-				else {
+				} else {
 					Log.e("check", "  server error       " + response)
 				}
 
@@ -181,7 +175,7 @@ class PaymentUpiActivity : AppCompatActivity() {
 
 	}
 
-	private fun upicall(upiid: String, txnid: String, amt: String, paymentmode: String,name:String){
+	private fun upicall(upiid: String, txnid: String, amt: String, paymentmode: String, name: String){
 
 //		payment = (this@PaymentUpiActivity.intent.getSerializableExtra(PaymentUpiActivity.EXTRA_KEY_PAYMENT) as PaymentUpi?)
 //		?: throw IllegalStateException("Unable to parse payment details")
@@ -220,7 +214,7 @@ class PaymentUpiActivity : AppCompatActivity() {
 		} else {
 			//Toast.makeText(this, "No UPI app found! Please Install to Proceed!", Toast.LENGTH_SHORT).show()
 			throwOnAppNotFound()
-			finish()
+
 		}
 	}
 
@@ -233,21 +227,25 @@ class PaymentUpiActivity : AppCompatActivity() {
 				val response = data.getStringExtra("response")
 
 				if (response == null) {
-					callbackTransactionCancelled()
-					Log.d(TAG, "Payment Response is null")
-				} else {
-					runCatching {
-						// Get transactions details from response.
-						val transactionDetails = getTransactionDetails(response)
 
-						// Update Listener onTransactionCompleted()
-						callbackTransactionCompleted(transactionDetails)
-					}.getOrElse {
-						callbackTransactionCancelled()
-					}
+					callbackTransactionCancelled()
+
+				} else {
+					val transactionDetails = getTransactionDetails(response)
+
+					// Update Listener onTransactionCompleted()
+					callbackTransactionCompleted(transactionDetails)
+//					runCatching {
+//						// Get transactions details from response.
+//
+//					}.getOrElse {
+//
+//
+//						callbackTransactionCancelled()
+//					}
 				}
 			} else {
-				Log.e(TAG, "Intent Data is null. User cancelled")
+
 				callbackTransactionCancelled()
 			}
 			finish()
@@ -265,7 +263,7 @@ class PaymentUpiActivity : AppCompatActivity() {
 					transactionRefId = get("txnRef"),
 					amount = payment.amount,
 					transactionStatus = get("Status")?.toUpperCase(Locale.getDefault())
-									?: TransactionStatus.FAILURE.name
+							?: TransactionStatus.FAILURE.name
 
 			)
 		}
@@ -285,9 +283,8 @@ class PaymentUpiActivity : AppCompatActivity() {
 
 	@JvmSynthetic
 	internal fun throwOnAppNotFound() {
-		Log.e("check", "  ef       " + payment.defaultPackage)
-		Log.e(TAG, "No UPI app found on device.")
 		callbackappnotfoundCancelled()
+		finish()
 		//throw AppNotFoundException(payment.defaultPackage)
 	}
 
@@ -313,13 +310,13 @@ class PaymentUpiActivity : AppCompatActivity() {
 			bankrefnumber = transactionDetails.approvalRefNo!!
 		}
 
-		walletResponse(transactionDetails.transactionId!!, res,transactionDetails.transactionStatus!!,bankrefnumber)
+		walletResponse(transactionDetails.transactionId!!, res, transactionDetails.transactionStatus!!, bankrefnumber)
 	}
 
-	private fun walletResponse(txn: String, res: String, status: String,bankrefnumber: String) {
+	private fun walletResponse(txn: String, res: String, status: String, bankrefnumber: String) {
 		tvtext.text = res+"     1     "+wallet.RetailerUpiID+"   2     "+venderupiId+"     3       "+bankrefnumber
 		val loginCall: Call<WalletResponse> = mservice.WalletResponse(wallet.userid, wallet.UToken, wallet.amount, venderupiId, ourrefid,
-				wallet.RetailerUpiID,res,status,bankrefnumber)
+				wallet.RetailerUpiID, res, status, bankrefnumber)
 
 		loginCall.enqueue(object : Callback<WalletResponse> {
 			override fun onResponse(call: Call<WalletResponse>, response: Response<WalletResponse>) {
