@@ -234,14 +234,15 @@ class PaymentUpiActivity : AppCompatActivity() {
 					val transactionDetails = getTransactionDetails(response)
 
 					// Update Listener onTransactionCompleted()
+				//	Toast.makeText(this@PaymentUpiActivity,""+transactionDetails, Toast.LENGTH_LONG).show()
 					callbackTransactionCompleted(transactionDetails)
 //					runCatching {
 //						// Get transactions details from response.
 //
 //					}.getOrElse {
 //
-//
-//						callbackTransactionCancelled()
+//						callbackTransactionCompleted(transactionDetails)
+//					//	callbackTransactionCancelled()
 //					}
 				}
 			} else {
@@ -303,14 +304,17 @@ class PaymentUpiActivity : AppCompatActivity() {
 	internal fun callbackTransactionCompleted(transactionDetails: TransactionDetails) {
 		//Singleton.listener?.onTransactionCompleted(transactionDetails)
 		val res:String = transactionDetails.toString()
-		var bankrefnumber:String = transactionDetails.approvalRefNo!!
-		if(bankrefnumber==null||bankrefnumber.equals("")){
+		var bankrefnumber:String
+
+
+		if(transactionDetails.approvalRefNo==null||transactionDetails.approvalRefNo.equals("")){
 			bankrefnumber = ""
+			walletResponse(transactionDetails.transactionId!!, res, transactionDetails.transactionStatus!!, bankrefnumber)
 		}else{
-			bankrefnumber = transactionDetails.approvalRefNo!!
+			walletResponse(transactionDetails.transactionId!!, res, transactionDetails.transactionStatus!!, transactionDetails.approvalRefNo!!)
 		}
 
-		walletResponse(transactionDetails.transactionId!!, res, transactionDetails.transactionStatus!!, bankrefnumber)
+
 	}
 
 	private fun walletResponse(txn: String, res: String, status: String, bankrefnumber: String) {
